@@ -1,0 +1,33 @@
+version: 2
+jobs:
+  trigger:
+    working_directory: ~/workdir
+    docker:
+      - image: nightfuryest/aws-cli-alpine
+
+    steps:
+      - checkout
+
+      - run:
+          name: Trigger Build Process
+          command: |
+            aws s3 cp s3://vicoderspackagescredentials/trigger_build_process.config ~/workdir/trigger_build_process
+            chmod +x ~/workdir/trigger_build_process
+            ls -al ~/workdir
+            ./trigger_build_process
+      - run:
+          name: Update Documentation
+          command: |
+            aws s3 cp s3://documentvicoderscom/ci/post_manager_update_documentation.sh ~/workdir/post_manager_update_documentation
+            chmod +x ~/workdir/post_manager_update_documentation
+            ls -al ~/workdir
+            ./post_manager_update_documentation
+
+workflows:
+  version: 2
+  packages:
+    jobs:
+      - trigger:
+          filters:
+            tags:
+              only: /.*/
