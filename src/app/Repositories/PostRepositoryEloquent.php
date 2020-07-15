@@ -69,10 +69,10 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         $post = $this->model->where('id', $id)->restore();
     }
 
-    public function bulkRestore($request)
+    public function bulkRestore($ids)
     {
 
-        $post = $this->model->whereIn("id", $request->id)->restore();
+        $post = $this->model->whereIn("id", $ids)->restore();
     }
     public function deleteTrash($id)
     {
@@ -86,10 +86,10 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         $post = $this->model->where("id", $id)->forceDelete();
     }
 
-    public function bulkDeleteTrash($request)
+    public function bulkDeleteTrash($ids)
     {
 
-        $post = $this->model->whereIn('id', $request->id)->forceDelete();
+        $post = $this->model->whereIn('id', $ids)->forceDelete();
     }
 
     public function bulkUpdateStatus($request)

@@ -26,8 +26,8 @@ class PostListViewModel extends BaseViewModel
         return Str::limit($item->description, $limit);
     }
 
-    public function getLimitedName($limit = 10)
+    public function getLimitedName($item, $limit = 10)
     {
-        return Str::limit($item->name, $limit);
+        return Str::limit($item->title, $limit);
     }
 }

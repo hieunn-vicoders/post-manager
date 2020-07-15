@@ -20,6 +20,7 @@ trait PostSchemaTrait
     {
         return [];
     }
+
     public function pagesSchema()
     {
         return [];

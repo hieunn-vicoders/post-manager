@@ -26,6 +26,8 @@ class PostTransformer extends TransformerAbstract
 
     public function transform($model)
     {
+        $author_name = $this->getNameAuthor($model);
+
         $transform = [
             'id'             => (int) $model->id,
             'title'          => $model->title,
@@ -33,7 +35,8 @@ class PostTransformer extends TransformerAbstract
             'description'    => $model->description,
             'content'        => $model->content,
             'type'           => $model->type,
-            'author_id'      => $model->author_id,
+            'author'         => $author_name,
+            'thumbnail'      => $model->thumbnail,
             'order'          => (int) $model->order,
             'status'         => (int) $model->status,
             'published_date' => $model->published_date,
@@ -57,6 +60,7 @@ class PostTransformer extends TransformerAbstract
     {
         return $this->collection($model->commentCount, new CommentCountTransformer());
     }
+
     public function includeTags($model)
     {
         if ($model->tags) {
@@ -77,8 +81,25 @@ class PostTransformer extends TransformerAbstract
             return $this->collection($model->categories, new CategoryTransformer());
         }
     }
+
     public function includeComments($model)
     {
         return $this->collection($model->comments, new CommentTransformer());
+    }
+
+    protected function getNameAuthor($model)
+    {
+        $author = $model->user;
+        $name   = null;
+        if ($author != null) {
+            if ($author->first_name != null && $author->last_name != null) {
+                $name = $author->first_name . ' ' . $author->last_name;
+            } else if ($author->first_name != null || $author->last_name != null) {
+                $name = $author->first_name ? $author->first_name : $author->last_name;
+            } else {
+                $name = $author->username;
+            }
+        }
+        return $name;
     }
 }

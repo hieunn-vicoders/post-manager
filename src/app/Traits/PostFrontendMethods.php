@@ -41,7 +41,7 @@ trait PostFrontendMethods
 
         $query = $this->applyQueryScope($query, 'type', $this->type);
         $query = $this->applyConstraintsFromRequest($query, $request);
-        $query = $this->applySearchFromRequest($query, ['title', 'description', 'content'], $request);
+        $query = $this->applySearchFromRequest($query, ['title', 'description', 'content'], $request, ['postMetas' => ['value']]);
         $query = $this->applyOrderByFromRequest($query, $request);
 
         $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
@@ -56,8 +56,7 @@ trait PostFrontendMethods
         return $this->response->paginator($posts, $transformer);
     }
 
-    function list(Request $request)
-    {
+    function list(Request $request) {
         $query = $this->entity;
 
         $query = $this->applyQueryScope($query, 'type', $this->type);
@@ -80,7 +79,7 @@ trait PostFrontendMethods
     {
         $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
         if (!$post) {
-            throw new NotFoundException(title_case($this->type) . ' entity');
+            throw new NotFoundException(($this->type) . ' entity');
         }
 
         if (config('post.auth_middleware.frontend.middleware') !== '') {
@@ -146,7 +145,7 @@ trait PostFrontendMethods
     {
         $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
         if (!$post) {
-            throw new NotFoundException(title_case($this->type) . ' entity');
+            throw new NotFoundException(($this->type) . ' entity');
         }
 
         if (config('post.auth_middleware.frontend.middleware') !== '') {
@@ -184,7 +183,7 @@ trait PostFrontendMethods
     {
         $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
         if (!$post) {
-            throw new NotFoundException(title_case($this->type) . ' entity');
+            throw new NotFoundException(($this->type) . ' entity');
         }
 
         if (config('post.auth_middleware.frontend.middleware') !== '') {
@@ -217,7 +216,7 @@ trait PostFrontendMethods
             ->get();
 
         if ($posts->count() == 0) {
-            throw new NotFoundException(title_case($this->type) . ' entities');
+            throw new NotFoundException(($this->type) . ' entities');
         }
 
         $this->validator->isValid($request, 'BULK_UPDATE_STATUS');
@@ -234,7 +233,7 @@ trait PostFrontendMethods
     {
         $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
         if (!$post) {
-            throw new NotFoundException(title_case($this->type) . ' entity');
+            throw new NotFoundException(($this->type) . ' entity');
         }
 
         if (config('post.auth_middleware.frontend.middleware') !== '') {

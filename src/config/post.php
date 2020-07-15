@@ -17,7 +17,7 @@ return [
     'viewModels'      => [
         'postList'   => VCComponent\Laravel\Post\ViewModels\PostList\PostListViewModel::class,
         'postDetail' => VCComponent\Laravel\Post\ViewModels\PostDetail\PostDetailViewModel::class,
-        'draf' => VCComponent\Laravel\Post\ViewModels\DrafDetail\DrafDetailViewModel::class,
+        'draf'       => VCComponent\Laravel\Post\ViewModels\DrafDetail\DrafDetailViewModel::class,
     ],
 
     'auth_middleware' => [
@@ -30,5 +30,8 @@ return [
             'except'     => [],
         ],
     ],
-
+    'cache'           => [
+        'enabled' => true,
+        'minutes' => 5,
+    ],
 ];

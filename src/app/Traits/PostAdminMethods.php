@@ -51,6 +51,7 @@ trait PostAdminMethods
         }
         return $query;
     }
+
     public function fomatDate($date)
     {
 
@@ -99,14 +100,13 @@ trait PostAdminMethods
     public function index(Request $request)
     {
         $query = $this->entity;
-
         $query = $this->getFromDate($request, $query);
         $query = $this->getToDate($request, $query);
         $query = $this->getStatus($request, $query);
 
         $query = $this->applyQueryScope($query, 'type', $this->type);
         $query = $this->applyConstraintsFromRequest($query, $request);
-        $query = $this->applySearchFromRequest($query, ['title', 'description', 'content'], $request);
+        $query = $this->applySearchFromRequest($query, ['title', 'description', 'content'], $request, ['postMetas' => ['value']]);
         $query = $this->applyOrderByFromRequest($query, $request);
 
         $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
@@ -130,7 +130,7 @@ trait PostAdminMethods
 
         $query = $this->applyQueryScope($query, 'type', $this->type);
         $query = $this->applyConstraintsFromRequest($query, $request);
-        $query = $this->applySearchFromRequest($query, ['title', 'description', 'content'], $request);
+        $query = $this->applySearchFromRequest($query, ['title', 'description', 'content'], $request, ['postMetas' => ['value']]);
         $query = $this->applyOrderByFromRequest($query, $request);
 
         $posts = $query->get();
@@ -144,11 +144,35 @@ trait PostAdminMethods
         return $this->response->collection($posts, $transformer);
     }
 
+    public function allListPostAndType(Request $request)
+    {
+        $query = $this->entity;
+        $query = $query->where('type', '!=', 'pages');
+
+        $query = $this->getFromDate($request, $query);
+        $query = $this->getToDate($request, $query);
+        $query = $this->getStatus($request, $query);
+        $query = $this->applyConstraintsFromRequest($query, $request);
+        $query = $this->applySearchFromRequest($query, ['title', 'description', 'content'], $request, ['postMetas' => ['value']]);
+        $query = $this->applyOrderByFromRequest($query, $request);
+
+        $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
+        $posts    = $query->paginate($per_page);
+
+        if ($request->has('includes')) {
+            $transformer = new $this->transformer(explode(',', $request->get('includes')));
+        } else {
+            $transformer = new $this->transformer;
+        }
+
+        return $this->response->paginator($posts, $transformer);
+    }
+
     public function show(Request $request, $id)
     {
         $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
         if (!$post) {
-            throw new NotFoundException(title_case($this->type) . ' entity');
+            throw new NotFoundException(($this->type) . ' entity');
         }
 
         if (config('post.auth_middleware.admin.middleware') !== '') {
@@ -204,7 +228,6 @@ trait PostAdminMethods
                     'value' => $value,
                 ]);
             }
-            // dd($post->postMetas);
         }
 
         event(new PostCreatedByAdminEvent($post));
@@ -271,6 +294,12 @@ trait PostAdminMethods
         return $this->success();
     }
 
+    public function getType()
+    {
+        $postTypes = $this->entity->postTypes();
+        return response()->json(['data' => array_diff($postTypes, ['pages'])]);
+    }
+
     public function bulkUpdateStatus(Request $request)
     {
         if (config('post.auth_middleware.admin.middleware') !== '') {
@@ -298,7 +327,7 @@ trait PostAdminMethods
 
         $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
         if (!$post) {
-            throw new NotFoundException(title_case($this->type) . ' entity');
+            throw new NotFoundException(($this->type) . ' entity');
         }
 
         $this->validator->isValid($request, 'UPDATE_STATUS_ITEM');
@@ -312,46 +341,62 @@ trait PostAdminMethods
 
     public function bulkDelete(Request $request)
     {
+        if (config('post.auth_middleware.admin.middleware') !== '') {
+            $user = $this->getAuthenticatedUser();
+            if (!$this->entity->ableToUpdate($user)) {
+                throw new PermissionDeniedException();
+            }
+        }
+        $this->validator->isValid($request, 'RULE_IDS');
         $ids   = $request->ids;
-        $posts = $this->entity::whereIn('id', $ids);
+        $query = $this->entity;
+        $query = $this->applyQueryScope($query, 'type', $this->type);
+        $posts = $query->whereIn('id', $ids);
         if (count($request->ids) > $posts->get()->count()) {
             throw new NotFoundException("Post");
         }
         $posts->delete();
         return $this->success();
     }
+
     public function restore($id)
     {
-
-        $post = $this->entity::where('id', $id)->get();
+        $query = $this->entity;
+        $query = $this->applyQueryScope($query, 'type', $this->type);
+        $post  = $query->where('id', $id)->get();
         if (count($post) > 0) {
             throw new NotFoundException('Post');
         }
 
         $this->repository->restore($id);
 
-        $restore = $this->entity::where('id', $id)->get();
+        $restore = $query->where('id', $id)->get();
         return $this->response->collection($restore, new $this->transformer());
     }
 
     public function bulkRestore(Request $request)
     {
-        $posts = $this->entity->onlyTrashed()->whereIn("id", $request->id)->get();
+        $this->validator->isValid($request, 'RULE_IDS');
+        $ids   = $request->ids;
+        $query = $this->entity;
+        $posts = $query->onlyTrashed()->whereIn("id", $ids)->get();
 
-        if (count($request->id) > $posts->count()) {
+        if (count($ids) > $posts->count()) {
             throw new NotFoundException("Post");
         }
 
-        $post = $this->repository->bulkRestore($request);
+        $post = $this->repository->bulkRestore($ids);
 
-        $post = $this->entity->whereIn('id', $request->id)->get();
+        $post = $this->entity->whereIn('id', $ids)->get();
 
         return $this->response->collection($post, new $this->transformer());
     }
 
     public function getAllTrash()
     {
-        $trash = $this->entity->onlyTrashed();
+        $query = $this->entity;
+        $query = $this->applyQueryScope($query, 'type', $this->type);
+        $trash = $query->onlyTrashed();
 
         if ($trash->first() == null) {
             throw new NotFoundException("Post");
@@ -361,9 +406,12 @@ trait PostAdminMethods
 
         return $this->response->collection($posts, new $this->transformer());
     }
+
     public function trash(Request $request)
     {
-        $trash = $this->entity->onlyTrashed();
+        $query = $this->entity;
+        $query = $this->applyQueryScope($query, 'type', $this->type);
+        $trash = $query->onlyTrashed();
 
         if ($trash->first() == null) {
             throw new NotFoundException("Post");
@@ -373,9 +421,13 @@ trait PostAdminMethods
 
         return $this->response->paginator($post, new $this->transformer());
     }
+
     public function deleteAllTrash()
     {
-        $posts = $this->entity->onlyTrashed()->forceDelete();
+        $query = $this->entity;
+        $query = $this->applyQueryScope($query, 'type', $this->type);
+
+        $posts = $query->onlyTrashed()->forceDelete();
         return $this->success();
     }
 
@@ -387,17 +439,24 @@ trait PostAdminMethods
 
     public function bulkDeleteTrash(Request $request)
     {
-        $posts = $this->findWhereIn("id", $request->id);
-        if (count($request->id) > $posts->count()) {
+        $this->validator->isValid($request, 'RULE_IDS');
+        $ids = $request->ids;
+
+        $posts = $this->entity->withTrashed()->WhereIn("id", $ids)->where('type', $this->type);
+
+        if (count($ids) > $posts->count()) {
             throw new NotFoundException("Post");
         }
-        $post = $this->repository->bulkDeleteTrash($request);
+        $post = $this->repository->bulkDeleteTrash($ids);
         return $this->success();
     }
+
     public function forceDelete($id)
     {
+        $query = $this->entity;
+        $query = $this->applyQueryScope($query, 'type', $this->type);
 
-        $post = $this->entity->where('id', $id)->first();
+        $post = $query->where('id', $id)->first();
         if (!$post) {
             throw new NotFoundException('Post');
         }
@@ -431,5 +490,4 @@ trait PostAdminMethods
 
         return $this->response->item($post, new $this->transformer);
     }
-
 }

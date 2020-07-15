@@ -17,7 +17,7 @@ $api->version('v1', function ($api) use ($postTypes) {
 
             $api->delete('posts/{id}/force', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@forceDelete');
             $api->delete('posts/trash/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@deleteAllTrash');
-            $api->delete('posts/trash/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@emptyTrash');
+            $api->delete('posts/trash/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDeleteTrash');
             $api->delete('posts/trash/{id}', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@deleteTrash');
             $api->get('posts/trash/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getAllTrash');
             $api->get('posts/trash', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@trash');
@@ -26,12 +26,15 @@ $api->version('v1', function ($api) use ($postTypes) {
 
             $api->put('posts/{id}/date', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@changeDate');
 
+            $api->get('posts/list-all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@allListPostAndType');
+
             $api->get('posts/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@list');
             $api->put('posts/status/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkUpdateStatus');
             $api->put('posts/status/{id}', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@updateStatusItem');
 
             $api->delete('posts/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDelete');
             $api->resource('posts', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface');
+            $api->get('postTypes', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getType');
 
             $api->get('pages/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@list');
             $api->put('pages/status/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkUpdateStatus');
@@ -42,8 +45,10 @@ $api->version('v1', function ($api) use ($postTypes) {
 
             if (count($postTypes)) {
                 foreach ($postTypes as $resource) {
+                    $api->delete($resource . '/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDelete');
+                    $api->delete($resource . '/{id}/force', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@forceDelete');
                     $api->delete($resource . '/trash/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@deleteAllTrash');
-                    $api->delete($resource . '/delete/trash/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDeleteTrash');
+                    $api->delete($resource . '/trash/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDeleteTrash');
                     $api->delete($resource . '/trash/{id}', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@deleteTrash');
                     $api->get($resource . '/trash/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getAllTrash');
                     $api->get($resource . '/trash', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@trash');
@@ -62,6 +67,11 @@ $api->version('v1', function ($api) use ($postTypes) {
         $api->put('posts/status/bulk', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@bulkUpdateStatus');
         $api->put('posts/status/{id}', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@updateStatusItem');
         $api->resource('posts', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface');
+
+        $api->get('pages/all', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@list');
+        $api->put('pages/status/bulk', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@bulkUpdateStatus');
+        $api->put('pages/status/{id}', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@updateStatusItem');
+        $api->resource('pages', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface');
 
         if (count($postTypes)) {
             foreach ($postTypes as $resource) {

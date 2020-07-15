@@ -72,7 +72,7 @@ trait PostQueryTrait
         }
 
         try {
-            return $this->postMetas()->where('key', $key)->first()->value;
+            return $this->postMetas->where('key', $key)->first()->value;
         } catch (Exception $e) {
             throw new NotFoundException($key . ' field');
         }

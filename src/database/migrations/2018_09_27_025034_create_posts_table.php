@@ -23,6 +23,7 @@ class CreatePostsTable extends Migration
             $table->integer('order')->default(0);
             $table->integer('author_id')->nullable();
             $table->integer('status')->default(0);
+            $table->string('thumbnail')->nullable();
             $table->dateTime('published_date')->useCurrent();
             $table->timestamps();
             $table->softDeletes();
