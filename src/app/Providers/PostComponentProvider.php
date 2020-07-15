@@ -35,7 +35,7 @@ class PostComponentProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__ . '/../../config/post.php' => config_path('post.php'),
-        ], 'config');
+        ]);
 
         $this->loadViewsFrom(__DIR__ . '/../../resources/views/', 'post-manager');
 
