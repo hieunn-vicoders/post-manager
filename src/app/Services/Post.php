@@ -23,7 +23,7 @@ class Post
             $this->query = new BaseModel;
         }
 
-        if (isset(config('post.cache')['enabled']) === true) {
+        if (config('post.cache')['enabled'] === true) {
             $this->cache     = true;
             $this->timeCache = config('post.cache')['minutes'] ? config('post.cache')['minutes'] * 60 : $this->cacheMinutes * 60;
         }
