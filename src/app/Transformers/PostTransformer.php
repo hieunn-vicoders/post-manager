@@ -26,8 +26,6 @@ class PostTransformer extends TransformerAbstract
 
     public function transform($model)
     {
-        $author_name = $this->getNameAuthor($model);
-
         $transform = [
             'id'             => (int) $model->id,
             'title'          => $model->title,
@@ -35,7 +33,7 @@ class PostTransformer extends TransformerAbstract
             'description'    => $model->description,
             'content'        => $model->content,
             'type'           => $model->type,
-            'author'         => $author_name,
+            'author_id'      => $model->author_id,
             'thumbnail'      => $model->thumbnail,
             'order'          => (int) $model->order,
             'status'         => (int) $model->status,
@@ -85,21 +83,5 @@ class PostTransformer extends TransformerAbstract
     public function includeComments($model)
     {
         return $this->collection($model->comments, new CommentTransformer());
-    }
-
-    protected function getNameAuthor($model)
-    {
-        $author = $model->user;
-        $name   = null;
-        if ($author != null) {
-            if ($author->first_name != null && $author->last_name != null) {
-                $name = $author->first_name . ' ' . $author->last_name;
-            } else if ($author->first_name != null || $author->last_name != null) {
-                $name = $author->first_name ? $author->first_name : $author->last_name;
-            } else {
-                $name = $author->username;
-            }
-        }
-        return $name;
     }
 }
