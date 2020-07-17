@@ -207,6 +207,8 @@ trait PostAdminMethods
         $this->validator->isValid($data['default'], 'RULE_ADMIN_CREATE');
         $this->validator->isSchemaValid($data['schema'], $schema_rules);
 
+        $data['default']['author_id'] = $this->getAuthenticatedUser()->id;
+
         $post       = $this->repository->create($data['default']);
         $post->type = $this->type;
         $post->save();
