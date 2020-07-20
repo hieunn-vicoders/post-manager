@@ -31,7 +31,7 @@ return [
         ],
     ],
     'cache'           => [
-        'enabled' => true,
+        'enabled' => false,
         'minutes' => 5,
     ],
 ];

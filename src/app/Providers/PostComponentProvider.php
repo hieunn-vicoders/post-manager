@@ -2,6 +2,7 @@
 
 namespace VCComponent\Laravel\Post\Providers;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use VCComponent\Laravel\Post\Commands\SchemaCommand;
 use VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface;
@@ -9,6 +10,7 @@ use VCComponent\Laravel\Post\Contracts\PostControllerInterface;
 use VCComponent\Laravel\Post\Contracts\ViewDrafDetailControllerInterface;
 use VCComponent\Laravel\Post\Contracts\ViewPostDetailControllerInterface;
 use VCComponent\Laravel\Post\Contracts\ViewPostListControllerInterface;
+use VCComponent\Laravel\Post\Entities\Post as BaseModel;
 use VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostController as AdminPostController;
 use VCComponent\Laravel\Post\Http\Controllers\Api\Frontend\PostController;
 use VCComponent\Laravel\Post\Http\Controllers\Web\DrafDetailController as ViewDrafDetailController;
@@ -31,6 +33,17 @@ class PostComponentProvider extends ServiceProvider
      */
     public function boot()
     {
+        if (isset(config('post.models')['post'])) {
+            $model       = config('post.models.post');
+            $this->model = $model;
+        } else {
+            $this->model = BaseModel::class;
+        }
+
+        Relation::morphMap([
+            'posts' => $this->model,
+        ]);
+
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
 
         $this->publishes([
