@@ -68,7 +68,6 @@ $api->version('v1', function ($api) use ($postTypes) {
                 }
             }
         });
-
         $api->get('posts/all', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@list');
         $api->put('posts/status/bulk', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@bulkUpdateStatus');
         $api->put('posts/status/{id}', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@updateStatusItem');
@@ -78,7 +77,6 @@ $api->version('v1', function ($api) use ($postTypes) {
         $api->put('pages/status/bulk', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@bulkUpdateStatus');
         $api->put('pages/status/{id}', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@updateStatusItem');
         $api->resource('pages', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface');
-
         if (count($postTypes)) {
             foreach ($postTypes as $resource) {
                 $api->get($resource . '/all', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@list');
