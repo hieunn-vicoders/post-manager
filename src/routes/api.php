@@ -15,6 +15,9 @@ $api->version('v1', function ($api) use ($postTypes) {
     $api->group(['prefix' => config('post.namespace')], function ($api) use ($postTypes) {
         $api->group(['prefix' => 'admin'], function ($api) use ($postTypes) {
 
+            $api->get('posts/filed-meta', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getFieldMeta');
+            $api->get('pages/filed-meta', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getFieldMeta');
+
             $api->delete('posts/{id}/force', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@forceDelete');
             $api->delete('posts/trash/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@deleteAllTrash');
             $api->delete('posts/trash/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDeleteTrash');
@@ -36,6 +39,8 @@ $api->version('v1', function ($api) use ($postTypes) {
             $api->resource('posts', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface');
             $api->get('postTypes', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getType');
 
+
+
             $api->get('pages/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@list');
             $api->put('pages/status/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkUpdateStatus');
             $api->put('pages/status/{id}', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@updateStatusItem');
@@ -45,6 +50,7 @@ $api->version('v1', function ($api) use ($postTypes) {
 
             if (count($postTypes)) {
                 foreach ($postTypes as $resource) {
+                    $api->get($resource . '/filed-meta', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getFieldMeta');
                     $api->delete($resource . '/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDelete');
                     $api->delete($resource . '/{id}/force', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@forceDelete');
                     $api->delete($resource . '/trash/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@deleteAllTrash');

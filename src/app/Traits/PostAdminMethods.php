@@ -492,4 +492,16 @@ trait PostAdminMethods
 
         return $this->response->item($post, new $this->transformer);
     }
+    public function getFieldMeta()
+    {
+        $type = $this->type;
+        $key  = ucwords($type) . 'Schema';
+        if (method_exists($this->entity, $key)) {
+            $fieldMeta = $this->entity->$key();
+        } else {
+            $fieldMeta = $this->entity->schema();
+        }
+
+        return response()->json(['data' => $fieldMeta]);
+    }
 }
