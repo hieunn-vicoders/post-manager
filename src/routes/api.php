@@ -6,7 +6,7 @@ if (config('post.models.post') !== null) {
     $model_class = VCComponent\Laravel\Post\Entities\Post::class;
 }
 
-$model     = new $model_class;
+$model = new $model_class;
 $postTypes = $model->postTypes();
 
 $api = app('Dingo\Api\Routing\Router');
@@ -14,6 +14,10 @@ $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) use ($postTypes) {
     $api->group(['prefix' => config('post.namespace')], function ($api) use ($postTypes) {
         $api->group(['prefix' => 'admin'], function ($api) use ($postTypes) {
+            /* API CRUD post_type_meta */
+            $api->resource('postTypeMeta', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostTypeMetaController');
+            $api->get('postTypeMetas/all', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostTypeMetaController@list');
+            /* END */
 
             $api->get('posts/filed-meta', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getFieldMeta');
             $api->get('pages/filed-meta', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getFieldMeta');
@@ -38,8 +42,6 @@ $api->version('v1', function ($api) use ($postTypes) {
             $api->delete('posts/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDelete');
             $api->resource('posts', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface');
             $api->get('postTypes', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getType');
-
-
 
             $api->get('pages/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@list');
             $api->put('pages/status/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkUpdateStatus');

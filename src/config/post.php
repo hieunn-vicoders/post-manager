@@ -6,11 +6,13 @@ return [
 
     'models'          => [
         'post' => VCComponent\Laravel\Post\Entities\Post::class,
+        'postTypeMeta' => VCComponent\Laravel\Post\Entities\PostTypeMeta::class,
         'draf' => VCComponent\Laravel\Post\Entities\Draftable::class,
     ],
 
     'transformers'    => [
         'post' => VCComponent\Laravel\Post\Transformers\PostTransformer::class,
+        'postTypeMeta' => VCComponent\Laravel\Post\Transformers\PostTypeMetaTransformer::class,
         'draf' => VCComponent\Laravel\Post\Transformers\DraftableTransformer::class,
     ],
 

@@ -70,6 +70,7 @@ class PostComponentProvider extends ServiceProvider
         $this->app->bind(PostRepository::class, PostRepositoryEloquent::class);
         $this->app->bind(PostValidatorInterface::class, PostValidator::class);
         $this->app->bind(DraftableRepository::class, DraftableRepositoryEloquent::class);
+        $this->app->bind(PostTypeMetaRepository::class, PostTypeMetaRepositoryEloquent::class);
 
         $this->registerViewModels();
         $this->registerControllers();
