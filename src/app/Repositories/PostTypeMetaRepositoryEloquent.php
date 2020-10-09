@@ -1,8 +1,10 @@
 <?php
 namespace VCComponent\Laravel\Post\Repositories;
+
 use Prettus\Repository\Eloquent\BaseRepository;
-use VCComponent\Laravel\Post\Repositories\PostTypeMetaRepository;
 use VCComponent\Laravel\Post\Entities\PostTypeMeta;
+use VCComponent\Laravel\Post\Repositories\PostTypeMetaRepository;
+
 class PostTypeMetaRepositoryEloquent extends BaseRepository implements PostTypeMetaRepository
 {
 

@@ -9,9 +9,9 @@ class PostTypeMetaTransformer extends TransformerAbstract
     public function transform($model)
     {
         return [
-            "id" => $model->id,
-            "type" => $model->type,
-            "key" => $model->key,
+            "id"    => $model->id,
+            "type"  => $model->type,
+            "key"   => $model->key,
             "value" => $model->value,
         ];
     }

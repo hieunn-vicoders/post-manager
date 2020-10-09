@@ -12,19 +12,19 @@ class PostTypeMeta extends Model
         return [
             'post-type' => [
                 'router_slug' => 'promotion',
-                'meta' => [
-                    'banner' => [
-                        'type' => 'file',
+                'meta'        => [
+                    'banner'      => [
+                        'type'  => 'file',
                         'label' => 'Ảnh bìa',
                         'rules' => [],
                     ],
-                    'rate' => [
-                        'type' => "integer",
+                    'rate'        => [
+                        'type'  => "integer",
                         'label' => 'Đánh giá',
                         'rules' => [],
                     ],
                     "description" => [
-                        "type" => "string",
+                        "type"  => "string",
                         "label" => "Mô tả",
                         "rules" => [],
                     ],

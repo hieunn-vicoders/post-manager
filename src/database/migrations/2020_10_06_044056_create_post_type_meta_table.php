@@ -14,7 +14,7 @@ class CreatPostTypeMetaTable extends Migration
     public function up()
     {
         //
-        Schema::create("post_type_meta", function(Blueprint $table){
+        Schema::create("post_type_meta", function (Blueprint $table) {
             $table->bigIncrements("id");
             $table->string("type");
             $table->string("key");
@@ -30,6 +30,6 @@ class CreatPostTypeMetaTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('post_type_meta');
     }
 }
