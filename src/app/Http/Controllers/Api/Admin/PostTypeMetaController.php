@@ -53,7 +53,7 @@ class PostTypeMetaController extends ApiController
         }
         $result = [];
         foreach ($requestDatas as $key => $value) {
-            $postTypeMeta = PostTypeMeta::updateOrCreate(["key" => $key], ["type" => $resource, "value" => $value]);
+            $postTypeMeta = $this->postTypeMetaEntity::updateOrCreate(["key" => $key], ["type" => $resource, "value" => $value]);
             if ($postTypeMeta->save()) {
                 $result[$key] = $value;
             }

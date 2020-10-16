@@ -5,7 +5,7 @@ return [
     'namespace'       => env('POST_COMPONENT_NAMESPACE', ''),
 
     'models'          => [
-        'post'         => App\Entities\Post::class,
+        'post'         => VCComponent\Laravel\Post\Entities\Post::class,
         'postTypeMeta' => VCComponent\Laravel\Post\Entities\PostTypeMeta::class,
         'draf'         => VCComponent\Laravel\Post\Entities\Draftable::class,
     ],
