@@ -20,6 +20,8 @@ use VCComponent\Laravel\Post\Repositories\DraftableRepository;
 use VCComponent\Laravel\Post\Repositories\DraftableRepositoryEloquent;
 use VCComponent\Laravel\Post\Repositories\PostRepository;
 use VCComponent\Laravel\Post\Repositories\PostRepositoryEloquent;
+use VCComponent\Laravel\Post\Repositories\PostTypeMetaRepository;
+use VCComponent\Laravel\Post\Repositories\PostTypeMetaRepositoryEloquent;
 use VCComponent\Laravel\Post\Services\Post;
 use VCComponent\Laravel\Post\Validators\PostValidator;
 use VCComponent\Laravel\Post\Validators\PostValidatorInterface;
@@ -68,9 +70,9 @@ class PostComponentProvider extends ServiceProvider
     {
         $this->app->bind("post", Post::class);
         $this->app->bind(PostRepository::class, PostRepositoryEloquent::class);
+        $this->app->bind(PostTypeMetaRepository::class, PostTypeMetaRepositoryEloquent::class);
         $this->app->bind(PostValidatorInterface::class, PostValidator::class);
         $this->app->bind(DraftableRepository::class, DraftableRepositoryEloquent::class);
-
         $this->registerViewModels();
         $this->registerControllers();
     }
@@ -86,7 +88,9 @@ class PostComponentProvider extends ServiceProvider
         $this->app->bind(ViewPostListControllerInterface::class, ViewPostListController::class);
         $this->app->bind(ViewPostDetailControllerInterface::class, ViewPostDetailController::class);
         $this->app->bind(AdminPostControllerInterface::class, AdminPostController::class);
+        $this->app->bind(AdminPostTypeControllerInterface::class, AdminPostController::class);
         $this->app->bind(PostControllerInterface::class, PostController::class);
         $this->app->bind(ViewDrafDetailControllerInterface::class, ViewDrafDetailController::class);
+
     }
 }

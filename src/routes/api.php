@@ -7,17 +7,14 @@ if (config('post.models.post') !== null) {
 }
 
 $model     = new $model_class;
-$postTypes = $model->postTypes();
-
-$api = app('Dingo\Api\Routing\Router');
-
+$postTypes = array_keys($model->postTypes());
+$api       = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) use ($postTypes) {
     $api->group(['prefix' => config('post.namespace')], function ($api) use ($postTypes) {
         $api->group(['prefix' => 'admin'], function ($api) use ($postTypes) {
 
             $api->get('posts/filed-meta', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getFieldMeta');
             $api->get('pages/filed-meta', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getFieldMeta');
-
             $api->delete('posts/{id}/force', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@forceDelete');
             $api->delete('posts/trash/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@deleteAllTrash');
             $api->delete('posts/trash/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDeleteTrash');
@@ -39,14 +36,21 @@ $api->version('v1', function ($api) use ($postTypes) {
             $api->resource('posts', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface');
             $api->get('postTypes', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getType');
 
-
-
             $api->get('pages/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@list');
             $api->put('pages/status/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkUpdateStatus');
             $api->put('pages/status/{id}', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@updateStatusItem');
             $api->resource('pages', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface');
 
             $api->resource('draft', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\DraftableController');
+
+            /* API CRU post_type_meta Table: show, store, update */
+            if (count($postTypes)) {
+                foreach ($postTypes as $resource) {
+                    $api->get('post-type-meta/{'. $resource .'}' , 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostTypeMetaController@show');
+                    $api->post('post-type-meta/{' . $resource . '}', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostTypeMetaController@updateOrCreate');
+                }
+            }
+            /* END */
 
             if (count($postTypes)) {
                 foreach ($postTypes as $resource) {
@@ -77,6 +81,7 @@ $api->version('v1', function ($api) use ($postTypes) {
         $api->put('pages/status/bulk', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@bulkUpdateStatus');
         $api->put('pages/status/{id}', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@updateStatusItem');
         $api->resource('pages', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface');
+
         if (count($postTypes)) {
             foreach ($postTypes as $resource) {
                 $api->get($resource . '/all', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@list');
