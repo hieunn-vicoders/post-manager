@@ -35,7 +35,7 @@ class PostTypeMetaController extends ApiController
         $postType    = $this->postTypeMetaRepository->findByField("type", $resource);
         $result      = [];
         foreach ($postType as $value) {
-            $result[$resource][$value->key] = $value->value;
+            $result[$value->key] = $value->value;
         }
         return response()->json(["data" => $result]);
     }
