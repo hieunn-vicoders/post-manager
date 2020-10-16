@@ -13,6 +13,8 @@ $api->version('v1', function ($api) use ($postTypes) {
     $api->group(['prefix' => config('post.namespace')], function ($api) use ($postTypes) {
         $api->group(['prefix' => 'admin'], function ($api) use ($postTypes) {
 
+            $api->get('posts/filed-meta', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getFieldMeta');
+            $api->get('pages/filed-meta', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getFieldMeta');
             $api->delete('posts/{id}/force', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@forceDelete');
             $api->delete('posts/trash/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@deleteAllTrash');
             $api->delete('posts/trash/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDeleteTrash');
@@ -41,21 +43,18 @@ $api->version('v1', function ($api) use ($postTypes) {
 
             $api->resource('draft', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\DraftableController');
 
-            /* API CRUD post_type_meta Table: index, list, show, store, update, destroy */
-            $api->get('post-type-meta', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostTypeMetaController@index');
-            $api->get('post-type-meta/all', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostTypeMetaController@list');
-            $api->get('post-type-meta/{id}', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostTypeMetaController@show');
-            $api->delete('post-type-meta/{id}', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostTypeMetaController@destroy');
+            /* API CRU post_type_meta Table: show, store, update */
             if (count($postTypes)) {
                 foreach ($postTypes as $resource) {
-                    $api->post('post-type-meta/{' . $resource . '}', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostTypeMetaController@store');
-                    $api->put('post-type-meta/{' . $resource . '}/{id}', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostTypeMetaController@update');
+                    $api->get('post-type-meta/{'. $resource .'}' , 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostTypeMetaController@show');
+                    $api->post('post-type-meta/{' . $resource . '}', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostTypeMetaController@updateOrCreate');
                 }
             }
             /* END */
 
             if (count($postTypes)) {
                 foreach ($postTypes as $resource) {
+                    $api->get($resource . '/filed-meta', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getFieldMeta');
                     $api->delete($resource . '/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDelete');
                     $api->delete($resource . '/{id}/force', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@forceDelete');
                     $api->delete($resource . '/trash/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@deleteAllTrash');
@@ -73,7 +72,6 @@ $api->version('v1', function ($api) use ($postTypes) {
                 }
             }
         });
-
         $api->get('posts/all', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@list');
         $api->put('posts/status/bulk', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@bulkUpdateStatus');
         $api->put('posts/status/{id}', 'VCComponent\Laravel\Post\Contracts\PostControllerInterface@updateStatusItem');
