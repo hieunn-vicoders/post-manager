@@ -25,10 +25,6 @@ class AlterPostsTable extends Migration
      */
     public function down()
     {
-        Schema::table('posts', function (Blueprint $table) {
-            if (Schema::hasColumn('is_hot')) {
-                $table->dropColumn('is_hot');
-            }
-        });
+        //
     }
 }
