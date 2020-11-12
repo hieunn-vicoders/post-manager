@@ -23,6 +23,8 @@ class Post extends Model implements Transformable, PostSchema, PostManagement
     const STATUS_PENDING   = 0;
     const STATUS_PUBLISHED = 1;
 
+    const HOT = 1;
+
     protected $fillable = [
         'title',
         'description',
@@ -33,6 +35,7 @@ class Post extends Model implements Transformable, PostSchema, PostManagement
         'published_date',
         'author_id',
         'thumbnail',
+        'is_hot'
     ];
 
     public function sluggable()
@@ -66,5 +69,10 @@ class Post extends Model implements Transformable, PostSchema, PostManagement
     public function getLimitedName($limit = 10)
     {
         return Str::limit($this->name, $limit);
+    }
+
+    public function scopeHot($query)
+    {
+        return $query->where('is_hot', self::HOT);
     }
 }

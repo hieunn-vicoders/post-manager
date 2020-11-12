@@ -30,4 +30,12 @@ trait PostQueryTrait
             $query->where('value', 1);
         })->latest()->limit($value)->get();
     }
+
+    public function hotPostsQuery($post, $type, $value) {
+        return $this->query->select('thumbnail', 'title', 'slug', 'description', 'id')->where('type', $type)
+        ->where('id', '<>', $post->id)
+        ->where('status', '1')
+        ->where('is_hot', '1')
+        ->latest()->limit($value)->get();
+    }
 }
