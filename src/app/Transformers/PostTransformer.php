@@ -35,6 +35,7 @@ class PostTransformer extends TransformerAbstract
             'type'           => $model->type,
             'author_id'      => $model->author_id,
             'thumbnail'      => $model->thumbnail,
+            'is_hot'         => $model->is_hot,
             'order'          => (int) $model->order,
             'status'         => (int) $model->status,
             'published_date' => $model->published_date,
