@@ -48,7 +48,7 @@ trait DraftableAdminMethods
             $transformer = new $this->transformer;
         }
 
-        $draft = $this->repository->findById($request, $id);
+        $draft = $this->entity->where('id', $id)->first();
 
         return $this->response->item($draft, $transformer);
     }

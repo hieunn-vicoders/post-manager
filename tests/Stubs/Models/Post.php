@@ -25,6 +25,21 @@ class Post extends BasePost
 
     public function aboutSchema()
     {
-        return [];
+        return [
+            'about' => [
+                'type' => 'string',
+                'rule' => [],
+            ],
+        ];
+    }
+
+    public function pagesSchema()
+    {
+        return [
+            'pages' => [
+                'type' => 'string',
+                'rule' => [],
+            ],
+        ];
     }
 }

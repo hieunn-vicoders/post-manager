@@ -19,3 +19,15 @@ $factory->define(PostWithSchemaAttributes::class, function (Faker $faker) {
         'content'     => $faker->paragraphs(rand(4, 7), true),
     ];
 });
+
+$factory->state(Post::class, 'pages', function () {
+    return [
+        'type' => 'pages',
+    ];
+});
+
+$factory->state(Post::class, 'about', function () {
+    return [
+        'type' => 'about',
+    ];
+});

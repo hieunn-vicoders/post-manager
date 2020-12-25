@@ -102,7 +102,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
             throw new NotFoundException("Post");
         }
 
-        $result = $this->whereIn("id", $request->ids)->update(['status' => $data['status']]);
+        $result = $this->model->whereIn("id", $request->ids)->update(['status' => $data['status']]);
 
         return $result;
     }
