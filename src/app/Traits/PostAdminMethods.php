@@ -24,7 +24,7 @@ trait PostAdminMethods
         $this->validator  = $validator;
         $this->type       = $this->getPostTypeFromRequest($request);
 
-        if (config('post.auth_middleware.admin.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.admin'))) {
             $this->middleware(
                 config('post.auth_middleware.admin.middleware'),
                 ['except' => config('post.auth_middleware.admin.except')]
@@ -170,16 +170,16 @@ trait PostAdminMethods
 
     public function show(Request $request, $id)
     {
-        $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
-        if (!$post) {
-            throw new NotFoundException(($this->type) . ' entity');
-        }
-
-        if (config('post.auth_middleware.admin.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToShow($user, $id)) {
                 throw new PermissionDeniedException();
             }
+        }
+
+        $post = $this->repository->findWhere(['id' => $id])->first();
+        if (!$post) {
+            throw new NotFoundException(($this->type) . ' entity');
         }
 
         if ($request->has('includes')) {
@@ -192,8 +192,9 @@ trait PostAdminMethods
     }
 
     public function store(Request $request)
-    {
-        if (config('post.auth_middleware.admin.middleware') !== '') {
+    {   
+        $user = null;
+        if (!empty(config('post.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToCreate($user)) {
                 throw new PermissionDeniedException();
@@ -207,8 +208,8 @@ trait PostAdminMethods
         $this->validator->isValid($data['default'], 'RULE_ADMIN_CREATE');
         $this->validator->isSchemaValid($data['schema'], $schema_rules);
 
-        $data['default']['author_id'] = $this->getAuthenticatedUser()->id;
-
+        $data['default']['author_id'] = $user ? $user->id : null;
+        
         $post       = $this->repository->create($data['default']);
         $post->type = $this->type;
         $post->save();
@@ -239,23 +240,26 @@ trait PostAdminMethods
 
     public function update(Request $request, $id)
     {
-        $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
-        if (!$post) {
-            throw new NotFoundException(Str::title($this->type) . ' entity');
-        }
-
-        if (config('post.auth_middleware.admin.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdateItem($user, $id)) {
                 throw new PermissionDeniedException();
             }
         }
 
+        $post = $this->repository->findWhere(['id' => $id])->first();
+        if (!$post) {
+            throw new NotFoundException(Str::title($this->type) . ' entity');
+        }
+
         $data         = $this->filterPostRequestData($request, $this->entity, $this->type);
         $schema_rules = $this->validator->getSchemaRules($this->entity, $this->type);
 
         $this->validator->isValid($data['default'], 'RULE_ADMIN_UPDATE');
-        $this->validator->isSchemaValid($data['schema'], $schema_rules);
+
+        if (array_key_exists('schema' ,$data) && $schema_rules) {
+            $this->validator->isSchemaValid($data['schema'], $schema_rules);
+        }
 
         $post = $this->repository->update($data['default'], $id);
 
@@ -276,19 +280,19 @@ trait PostAdminMethods
     }
 
     public function destroy(Request $request, $id)
-    {
-        $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
-        if (!$post) {
-            throw new NotFoundException(Str::title($this->type) . ' entity');
-        }
-
-        if (config('post.auth_middleware.admin.middleware') !== '') {
+    {   
+        if (!empty(config('post.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToDelete($user, $id)) {
                 throw new PermissionDeniedException();
             }
         }
 
+        $post = $this->repository->findWhere(['id' => $id])->first();
+        if (!$post) {
+            throw new NotFoundException(Str::title($this->type));
+        }
+       
         $this->repository->delete($id);
 
         event(new PostDeletedEvent());
@@ -304,7 +308,7 @@ trait PostAdminMethods
 
     public function bulkUpdateStatus(Request $request)
     {
-        if (config('post.auth_middleware.admin.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdate($user)) {
                 throw new PermissionDeniedException();
@@ -320,7 +324,7 @@ trait PostAdminMethods
 
     public function updateStatusItem(Request $request, $id)
     {
-        if (config('post.auth_middleware.admin.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdateItem($user, $id)) {
                 throw new PermissionDeniedException();
@@ -343,7 +347,7 @@ trait PostAdminMethods
 
     public function bulkDelete(Request $request)
     {
-        if (config('post.auth_middleware.admin.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdate($user)) {
                 throw new PermissionDeniedException();
@@ -373,7 +377,7 @@ trait PostAdminMethods
         $this->repository->restore($id);
 
         $restore = $query->where('id', $id)->get();
-        return $this->response->collection($restore, new $this->transformer());
+        return $this->success();
     }
 
     public function bulkRestore(Request $request)
@@ -391,22 +395,16 @@ trait PostAdminMethods
 
         $post = $this->entity->whereIn('id', $ids)->get();
 
-        return $this->response->collection($post, new $this->transformer());
+        return $this->success();
     }
 
     public function getAllTrash()
     {
         $query = $this->entity;
         $query = $this->applyQueryScope($query, 'type', $this->type);
-        $trash = $query->onlyTrashed();
-
-        if ($trash->first() == null) {
-            throw new NotFoundException("Post");
-        }
-
-        $posts = $trash->get();
-
-        return $this->response->collection($posts, new $this->transformer());
+        $trash = $query->onlyTrashed()->get();
+ 
+        return $this->response->collection($trash, new $this->transformer());
     }
 
     public function trash(Request $request)
@@ -442,12 +440,10 @@ trait PostAdminMethods
     public function bulkDeleteTrash(Request $request)
     {
         $this->validator->isValid($request, 'RULE_IDS');
-        $ids = $request->ids;
-
-        $posts = $this->entity->withTrashed()->WhereIn("id", $ids)->where('type', $this->type);
-
+        $ids   = $request->ids;
+        $posts = $this->entity->onlyTrashed()->whereIn("id", $ids)->get();
         if (count($ids) > $posts->count()) {
-            throw new NotFoundException("Post");
+            throw new NotFoundException("post");
         }
         $post = $this->repository->bulkDeleteTrash($ids);
         return $this->success();
@@ -470,24 +466,24 @@ trait PostAdminMethods
 
     public function changeDate(Request $request, $id)
     {
-        $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
-        if (!$post) {
-            throw new NotFoundException(Str::title($this->type) . ' entity');
-        }
-
-        if (config('post.auth_middleware.admin.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdateItem($user, $id)) {
                 throw new PermissionDeniedException();
             }
         }
 
+        $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
+        if (!$post) {
+            throw new NotFoundException(Str::title($this->type) . ' entity');
+        }
+
         $this->validator->isValid($request, 'RULE_ADMIN_UPDATE_DATE');
 
         $data = $request->all();
 
-        $data            = Carbon::parse($request->post_date)->format('Y-m-d');
-        $post->post_date = $data;
+        $data            = Carbon::parse($request->published_date)->format('Y-m-d');
+        $post->published_date = $data;
         $post->save();
 
         return $this->response->item($post, new $this->transformer);

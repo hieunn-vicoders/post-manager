@@ -15,7 +15,7 @@ class FrontendPageControllerTest extends TestCase
      */
     public function can_create_post_by_frontend_router()
     {
-        $data = factory(Post::class)->make()->toArray();
+        $data = factory(Post::class)->state('pages')->make()->toArray();
 
         $response = $this->json('POST', 'api/post-management/pages', $data);
 
@@ -30,8 +30,11 @@ class FrontendPageControllerTest extends TestCase
      */
     public function can_update_post_by_frontend_router()
     {
-        $post = factory(Post::class)->make();
+        $post = factory(Post::class)->state('pages')->make();
         $post->save();
+
+        unset($post['updated_at']);
+        unset($post['created_at']);
 
         $id          = $post->id;
         $post->title = 'update title';
@@ -54,7 +57,10 @@ class FrontendPageControllerTest extends TestCase
      */
     public function can_delete_post_by_frontend_router()
     {
-        $post = factory(Post::class)->create()->toArray();
+        $post = factory(Post::class)->state('pages')->create()->toArray();
+
+        unset($post['updated_at']);
+        unset($post['created_at']);
 
         $this->assertDatabaseHas('posts', $post);
 
@@ -63,15 +69,15 @@ class FrontendPageControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
 
-        $this->assertDatabaseMissing('posts', $post);
+        $this->assertSoftDeleted('posts', $post);
     }
 
     /**
      * @test
      */
-    public function can_retrieve_post_item_by_frontend_router()
+    public function can_get_post_item_by_frontend_router()
     {
-        $post = factory(Post::class)->create();
+        $post = factory(Post::class)->state('pages')->create();
 
         $response = $this->call('GET', 'api/post-management/pages/' . $post->id);
 
@@ -88,12 +94,84 @@ class FrontendPageControllerTest extends TestCase
     /**
      * @test
      */
-    public function can_retrieve_post_list_by_frontend_router()
+    public function can_get_post_list_by_frontend_router()
     {
-        $posts = factory(Post::class, 5)->create();
+        $posts = factory(Post::class, 5)->state('pages')->create();
 
         $response = $this->call('GET', 'api/post-management/pages');
 
         $response->assertStatus(200);
+    }
+
+     /**
+     * @test
+     */
+    public function can_get_post_list_with_no_paginate_by_frontend_router()
+    {
+        $post = factory(Post::class)->state('pages')->create()->toArray();
+        unset($post['updated_at']);
+        unset($post['created_at']);
+
+        $this->assertDatabaseHas('posts', $post);
+        
+        $response = $this->call('GET', 'api/post-management/pages/all');
+        $response->assertJsonMissingExact([
+            'meta' => [
+                'pagination' => [
+                    'total', 'count', 'per_page', 'current_page', 'total_pages', 'links' => [],
+                ],
+            ],
+        ]);
+        $response->assertJson(['data' => [$post]]);
+    }
+
+     /**
+     * @test
+     */
+    public function can_bulk_update_status_pages_by_frontend_router()
+    {
+        $posts = factory(Post::class, 5)->state('pages')->create();
+
+        $posts = $posts->map(function ($e) {
+            unset($e['updated_at']);
+            unset($e['created_at']);
+            return $e;
+        })->toArray();
+
+        $listIds = array_column($posts, 'id');
+        $data    = ['ids' => $listIds, 'status' => 5];
+
+        $response = $this->json('GET', 'api/post-management/pages/all');
+        $response->assertJsonFragment(['status' => 0]);
+
+        $response = $this->json('PUT', 'api/post-management/pages/status/bulk', $data);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $response = $this->json('GET', 'api/post-management/pages/all');
+        $response->assertJsonFragment(['status' => 5]);
+    }
+
+     /**
+     * @test
+     */
+    public function can_update_status_a_page_by_frontend_router()
+    {
+        $post = factory(Post::class)->state('pages')->create()->toArray();
+        unset($post['updated_at']);
+        unset($post['created_at']);
+
+        $this->assertDatabaseHas('posts', $post);
+
+        $data     = ['status' => 2];
+        $response = $this->json('PUT', 'api/post-management/pages/' . $post['id'] . '/status', $data);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $response = $this->json('GET', 'api/post-management/pages/' . $post['id']);
+
+        $response->assertJson(['data' => $data]);
     }
 }

@@ -23,7 +23,7 @@ class PostValidator extends AbstractValidator implements PostValidatorInterface
             'content'     => ['required'],
         ],
         ValidatorInterface::RULE_ADMIN_UPDATE_DATE => [
-            'post_date' => ['required'],
+            'published_date' => ['required'],
         ],
         ValidatorInterface::RULE_CREATE            => [
             'title'       => ['required'],
@@ -50,28 +50,32 @@ class PostValidator extends AbstractValidator implements PostValidatorInterface
 
     public function getSchemaRules($entity, $type)
     {
+        $rules  = null;
         $schema = $this->getSchemaFunction($entity, $type);
-
-        $rules = $schema->map(function ($item) {
-            return $item['rule'];
-        });
-
-        return $rules->toArray();
+        if ($schema) {
+            $rules = $schema->map(function ($item) {
+                return $item['rule'];
+            })->toArray();
+        }
+        return $rules;
     }
 
     public function getNoRuleFields($entity, $type)
     {
+        $fields = null;
         $schema = $this->getSchemaFunction($entity, $type);
-
-        $fields = $schema->filter(function ($item) {
-            return count($item['rule']) === 0;
-        });
-
-        return $fields->toArray();
+        if ($schema) {
+            $fields = $schema->filter(function ($item) {
+                return count($item['rule']) === 0;
+            })->toArray();
+        }
+        return $fields;
     }
 
     private function getSchemaFunction($entity, $type)
     {
+        $schema = null;
+
         if (count($entity->postTypes()) && $type !== 'posts') {
             $schema_func = Str::camel($type . '_schema');
             $schema      = collect($entity->$schema_func());

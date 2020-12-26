@@ -2,7 +2,7 @@
 
 namespace VCComponent\Laravel\Post\Validators;
 
-use VCComponent\Laravel\Menu\Validators\ValidatorInterface;
+use VCComponent\Laravel\Vicoders\Core\Validators\ValidatorInterface;
 use VCComponent\Laravel\Vicoders\Core\Validators\AbstractValidator;
 
 class DraftableValidator extends AbstractValidator

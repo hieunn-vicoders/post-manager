@@ -21,7 +21,7 @@ trait PostFrontendMethods
         $this->validator  = $validator;
         $this->type       = $this->getPostTypeFromRequest($request);
 
-        if (config('post.auth_middleware.frontend.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.frontend'))) {
             $this->middleware(
                 config('post.auth_middleware.frontend.middleware'),
                 ['except' => config('post.auth_middleware.frontend.except')]
@@ -77,16 +77,16 @@ trait PostFrontendMethods
 
     public function show(Request $request, $id)
     {
-        $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
-        if (!$post) {
-            throw new NotFoundException(($this->type) . ' entity');
-        }
-
-        if (config('post.auth_middleware.frontend.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.frontend'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToShow($user, $id)) {
                 throw new PermissionDeniedException();
             }
+        }
+
+        $post = $this->repository->findWhere(['id' => $id])->first();
+        if (!$post) {
+            throw new NotFoundException($this->type);
         }
 
         if ($request->has('includes')) {
@@ -100,7 +100,7 @@ trait PostFrontendMethods
 
     public function store(Request $request)
     {
-        if (config('post.auth_middleware.frontend.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.frontend'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToCreate($user)) {
                 throw new PermissionDeniedException();
@@ -112,7 +112,9 @@ trait PostFrontendMethods
         $no_rule_fields = $this->validator->getNoRuleFields($this->entity, $this->type);
 
         $this->validator->isValid($data['default'], 'RULE_ADMIN_CREATE');
-        $this->validator->isSchemaValid($data['schema'], $schema_rules);
+        if (array_key_exists('schema' ,$data) && $schema_rules) {
+            $this->validator->isSchemaValid($data['schema'], $schema_rules);
+        }
 
         $post       = $this->repository->create($data['default']);
         $post->type = $this->type;
@@ -127,7 +129,7 @@ trait PostFrontendMethods
             }
         }
 
-        if (count($no_rule_fields)) {
+        if ($no_rule_fields && count($no_rule_fields)) {
             foreach ($no_rule_fields as $key => $value) {
                 $post->postMetas()->updateOrCreate([
                     'key'   => $key,
@@ -143,24 +145,27 @@ trait PostFrontendMethods
 
     public function update(Request $request, $id)
     {
-        $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
-        if (!$post) {
-            throw new NotFoundException(($this->type) . ' entity');
-        }
-
-        if (config('post.auth_middleware.frontend.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.frontend'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdateItem($user, $id)) {
                 throw new PermissionDeniedException();
             }
+        }
+ 
+        $post = $this->repository->findWhere(['id' => $id])->first();
+        if (!$post) {
+            throw new NotFoundException(($this->type) . ' entity');
         }
 
         $data         = $this->filterPostRequestData($request, $this->entity, $this->type);
         $schema_rules = $this->validator->getSchemaRules($this->entity, $this->type);
 
         $this->validator->isValid($data['default'], 'RULE_ADMIN_UPDATE');
-        $this->validator->isSchemaValid($data['schema'], $schema_rules);
 
+        if (array_key_exists('schema' ,$data) && $schema_rules) {
+            $this->validator->isSchemaValid($data['schema'], $schema_rules);
+        }
+        
         $post = $this->repository->update($data['default'], $id);
 
         if ($request->has('status')) {
@@ -181,16 +186,16 @@ trait PostFrontendMethods
 
     public function destroy(Request $request, $id)
     {
-        $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
-        if (!$post) {
-            throw new NotFoundException(($this->type) . ' entity');
-        }
-
-        if (config('post.auth_middleware.frontend.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.frontend'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToDelete($user, $id)) {
                 throw new PermissionDeniedException();
             }
+        }
+
+        $post = $this->repository->findWhere(['id' => $id])->first();
+        if (!$post) {
+            throw new NotFoundException(($this->type) . ' entity');
         }
 
         $this->repository->delete($id);
@@ -202,7 +207,7 @@ trait PostFrontendMethods
 
     public function bulkUpdateStatus(Request $request)
     {
-        if (config('post.auth_middleware.frontend.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.frontend'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdate($user)) {
                 throw new PermissionDeniedException();
@@ -211,7 +216,7 @@ trait PostFrontendMethods
 
         $data = $request->all();
 
-        $posts = $this->entity->whereIn('id', $data['item_ids'])
+        $posts = $this->entity->whereIn('id', $data['ids'])
             ->where('type', $this->type)
             ->get();
 
@@ -236,7 +241,7 @@ trait PostFrontendMethods
             throw new NotFoundException(($this->type) . ' entity');
         }
 
-        if (config('post.auth_middleware.frontend.middleware') !== '') {
+        if (!empty(config('post.auth_middleware.frontend'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdateItem($user, $id)) {
                 throw new PermissionDeniedException();
