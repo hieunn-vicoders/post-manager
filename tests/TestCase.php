@@ -57,20 +57,14 @@ class TestCase extends OrchestraTestCase
         ]);
         $app['config']->set('post.namespace', 'post-management');
         $app['config']->set('post.models', [
-            'post' => \VCComponent\Laravel\Post\Entities\Post::class,
+            'post' => \VCComponent\Laravel\Post\Test\Stubs\Models\Post::class,
         ]);
         $app['config']->set('post.transformers', [
             'post' => \VCComponent\Laravel\Post\Transformers\PostTransformer::class,
         ]);
         $app['config']->set('post.auth_middleware', [
-            'admin'    => [
-                'middleware' => '',
-                'except'     => [],
-            ],
-            'frontend' => [
-                'middleware' => '',
-                'except'     => [],
-            ],
+            'admin'    => [],
+            'frontend' => [],
         ]);
         $app['config']->set('api', [
             'standardsTree'      => 'x',
