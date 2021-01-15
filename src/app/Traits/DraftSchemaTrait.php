@@ -4,9 +4,12 @@ namespace VCComponent\Laravel\Post\Traits;
 
 trait DraftSchemaTrait
 {
-    public function drafTypes()
+    public function draftTypes()
     {
-        return [];
+        return [
+            'products',
+            'posts'
+        ];
     }
 
 }

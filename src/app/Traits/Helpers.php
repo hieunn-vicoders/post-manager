@@ -103,6 +103,8 @@ trait Helpers
             foreach ($path_items as $item) {
                 if ($value === $item) {
                     $type = $value;
+                } else if ($item === 'pages') {
+                    $type = 'pages';
                 }
             }
         }
@@ -110,22 +112,24 @@ trait Helpers
         return $type;
     }
 
-    private function drafTypes($request)
+    private function draftTypes($request)
     {
-        if (config('post.models.draf') !== null) {
-            $model_class = config('post.models.draf');
+        if (config('post.models.draft') !== null) {
+            $model_class = config('post.models.draft');
         } else {
             $model_class = \VCComponent\Laravel\Post\Entities\Draftable::class;
         }
         $model      = new $model_class;
-        $drafTypes  = $model->drafTypes();
+        $draftTypes = $model->draftTypes();
         $path_items = collect(explode('/', $request->path()));
 
         $type = 'posts';
-        foreach ($drafTypes as $value) {
+        foreach ($draftTypes as $value) {
             foreach ($path_items as $item) {
                 if ($value === $item) {
                     $type = $value;
+                } else if ($item === 'pages') {
+                    $type = 'pages';
                 }
             }
         }

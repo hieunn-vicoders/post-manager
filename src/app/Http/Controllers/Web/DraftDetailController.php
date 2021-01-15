@@ -4,12 +4,12 @@ namespace VCComponent\Laravel\Post\Http\Controllers\Web;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use VCComponent\Laravel\Post\Contracts\ViewDrafDetailControllerInterface;
+use VCComponent\Laravel\Post\Contracts\ViewDraftDetailControllerInterface;
 use VCComponent\Laravel\Post\Repositories\DraftableRepository;
 use VCComponent\Laravel\Post\Traits\Helpers;
-use VCComponent\Laravel\Post\ViewModels\DrafDetail\DrafDetailViewModel;
+use VCComponent\Laravel\Post\ViewModels\DraftDetail\DraftDetailViewModel;
 
-class DrafDetailController extends Controller implements ViewDrafDetailControllerInterface
+class DraftDetailController extends Controller implements ViewDraftDetailControllerInterface
 {
     use Helpers;
 
@@ -24,14 +24,14 @@ class DrafDetailController extends Controller implements ViewDrafDetailControlle
         if (isset(config('post.viewModels')['postDetail'])) {
             $this->ViewModel = config('post.viewModels.postDetail');
         } else {
-            $this->ViewModel = DrafDetailViewModel::class;
+            $this->ViewModel = DraftDetailViewModel::class;
         }
     }
 
     public function show($id, Request $request)
     {
 
-        $type = $this->drafTypes($request);
+        $type = $this->draftTypes($request);
 
         $post_preview = $this->entity->where([['draftable_id', '=', $id], ['draftable_type', '=', $type]])->firstOrFail();
 

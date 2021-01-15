@@ -9,6 +9,7 @@ $factory->define(Post::class, function (Faker $faker) {
         'title'       => $faker->words(rand(4, 7), true),
         'description' => $faker->sentences(rand(4, 7), true),
         'content'     => $faker->paragraphs(rand(4, 7), true),
+        'status'      => 1
     ];
 });
 

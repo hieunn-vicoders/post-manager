@@ -1,6 +1,6 @@
 <?php
 
-namespace VCComponent\Laravel\Post\Test\Feature\PostType;
+namespace VCComponent\Laravel\Post\Test\Feature\Api\PostType;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use VCComponent\Laravel\Post\Entities\Post;
@@ -385,7 +385,7 @@ class AdminPostControllerTest extends TestCase
         $data    = ['ids' => $listIds, 'status' => 5];
 
         $response = $this->json('GET', 'api/post-management/admin/about/all');
-        $response->assertJsonFragment(['status' => 0]);
+        $response->assertJsonFragment(['status' => 1]);
 
         $response = $this->json('PUT', 'api/post-management/admin/about/status/bulk', $data);
 
