@@ -9,14 +9,6 @@ class Draftable extends Model
 {
     use DraftSchemaTrait;
 
-    public function drafTypes()
-    {
-        return [
-            'products',
-            'posts',
-        ];
-    }
-
     protected $fillable = [
         'draftable_type',
         'draftable_id',

@@ -1,6 +1,6 @@
 <?php
 
-namespace VCComponent\Laravel\Post\Test\Feature\Draft;
+namespace VCComponent\Laravel\Post\Test\Feature\Api\Draft;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use VCComponent\Laravel\Post\Entities\Draftable;

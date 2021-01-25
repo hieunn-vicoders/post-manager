@@ -6,18 +6,18 @@ return [
 
     'models'          => [
         'post' => VCComponent\Laravel\Post\Entities\Post::class,
-        'draf' => VCComponent\Laravel\Post\Entities\Draftable::class,
+        'draft' => VCComponent\Laravel\Post\Entities\Draftable::class,
     ],
 
     'transformers'    => [
         'post' => VCComponent\Laravel\Post\Transformers\PostTransformer::class,
-        'draf' => VCComponent\Laravel\Post\Transformers\DraftableTransformer::class,
+        'draft' => VCComponent\Laravel\Post\Transformers\DraftableTransformer::class,
     ],
 
     'viewModels'      => [
         'postList'   => VCComponent\Laravel\Post\ViewModels\PostList\PostListViewModel::class,
         'postDetail' => VCComponent\Laravel\Post\ViewModels\PostDetail\PostDetailViewModel::class,
-        'draf'       => VCComponent\Laravel\Post\ViewModels\DrafDetail\DrafDetailViewModel::class,
+        'draft'       => VCComponent\Laravel\Post\ViewModels\DraftDetail\DraftDetailViewModel::class,
     ],
 
     'auth_middleware' => [
