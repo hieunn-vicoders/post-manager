@@ -23,24 +23,24 @@ Route::prefix(config('post.namespace'))
         }
     });
 
-if (config('post.models.draf') !== null) {
-    $model_darfts = config('post.models.draf');
+if (config('post.models.draft') !== null) {
+    $model_darfts = config('post.models.draft');
 } else {
     $model_darfts = VCComponent\Laravel\Post\Entities\Draftable::class;
 }
 
-$model_darf = new $model_darfts;
-$drafTypes  = $model_darf->drafTypes();
+$model_draft = new $model_darfts;
+$draftTypes  = $model_draft->draftTypes();
 
 Route::prefix(config('post.namespace'))
     ->middleware('web')
-    ->group(function () use ($drafTypes) {
+    ->group(function () use ($draftTypes) {
 
-        Route::get('/post-preview/{id}', 'VCComponent\Laravel\Post\Contracts\ViewDrafDetailControllerInterface@show');
+        Route::get('/post-preview/{id}', 'VCComponent\Laravel\Post\Contracts\ViewDraftDetailControllerInterface@show');
 
-        if (count($drafTypes)) {
-            foreach ($drafTypes as $type) {
-                Route::get('/preview/{id}/' . $type, 'VCComponent\Laravel\Post\Contracts\ViewDrafDetailControllerInterface@show');
+        if (count($draftTypes)) {
+            foreach ($draftTypes as $type) {
+                Route::get('/preview/' . $type . '/{id}', 'VCComponent\Laravel\Post\Contracts\ViewDraftDetailControllerInterface@show');
             }
         }
     });

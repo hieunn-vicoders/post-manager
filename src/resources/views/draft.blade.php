@@ -1,5 +1,3 @@
-@extends('layout.master')
-@section('content')
 <section class="bg-bread">
     <div class="container">
         <nav class="breadcrumb">#
@@ -19,8 +17,8 @@
                         d
                     </div>
                     <div class="content">
-                        @if($draf)
-                        {!! $draf->payload !!}
+                        @if($draft)
+                        {!! $draft->payload !!}
                         @else
                         <p> chưa có bài viết</p>
                         @endif
@@ -30,5 +28,3 @@
         </div>
     </div>
 </section>
-@endsection
-@section('footer')
