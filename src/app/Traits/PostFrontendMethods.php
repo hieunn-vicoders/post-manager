@@ -21,7 +21,7 @@ trait PostFrontendMethods
         $this->validator  = $validator;
         $this->type       = $this->getPostTypeFromRequest($request);
 
-        if (!empty(config('post.auth_middleware.frontend'))) {
+        if (config('post.auth_middleware.frontend.middleware') !== '') {
             $this->middleware(
                 config('post.auth_middleware.frontend.middleware'),
                 ['except' => config('post.auth_middleware.frontend.except')]
@@ -77,7 +77,7 @@ trait PostFrontendMethods
 
     public function show(Request $request, $id)
     {
-        if (!empty(config('post.auth_middleware.frontend'))) {
+        if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToShow($user, $id)) {
                 throw new PermissionDeniedException();
@@ -100,7 +100,7 @@ trait PostFrontendMethods
 
     public function store(Request $request)
     {
-        if (!empty(config('post.auth_middleware.frontend'))) {
+        if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToCreate($user)) {
                 throw new PermissionDeniedException();
@@ -145,13 +145,13 @@ trait PostFrontendMethods
 
     public function update(Request $request, $id)
     {
-        if (!empty(config('post.auth_middleware.frontend'))) {
+        if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdateItem($user, $id)) {
                 throw new PermissionDeniedException();
             }
         }
- 
+
         $post = $this->repository->findWhere(['id' => $id])->first();
         if (!$post) {
             throw new NotFoundException(($this->type) . ' entity');
@@ -165,7 +165,7 @@ trait PostFrontendMethods
         if (array_key_exists('schema' ,$data) && $schema_rules) {
             $this->validator->isSchemaValid($data['schema'], $schema_rules);
         }
-        
+
         $post = $this->repository->update($data['default'], $id);
 
         if ($request->has('status')) {
@@ -186,7 +186,7 @@ trait PostFrontendMethods
 
     public function destroy(Request $request, $id)
     {
-        if (!empty(config('post.auth_middleware.frontend'))) {
+        if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToDelete($user, $id)) {
                 throw new PermissionDeniedException();
@@ -207,7 +207,7 @@ trait PostFrontendMethods
 
     public function bulkUpdateStatus(Request $request)
     {
-        if (!empty(config('post.auth_middleware.frontend'))) {
+        if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdate($user)) {
                 throw new PermissionDeniedException();
@@ -241,7 +241,7 @@ trait PostFrontendMethods
             throw new NotFoundException(($this->type) . ' entity');
         }
 
-        if (!empty(config('post.auth_middleware.frontend'))) {
+        if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdateItem($user, $id)) {
                 throw new PermissionDeniedException();
