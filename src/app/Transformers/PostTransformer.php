@@ -8,6 +8,7 @@ use VCComponent\Laravel\Comment\Transformers\CommentCountTransformer;
 use VCComponent\Laravel\Comment\Transformers\CommentTransformer;
 use VCComponent\Laravel\MediaManager\Transformers\MediaTransformer;
 use VCComponent\Laravel\Tag\Transformers\TagTransformer;
+use VCComponent\Laravel\Post\Transformers\PostMetaTransformer;
 
 class PostTransformer extends TransformerAbstract
 {
@@ -17,6 +18,7 @@ class PostTransformer extends TransformerAbstract
         'tags',
         'media',
         'categories',
+        'postMetas'
     ];
 
     public function __construct($includes = [])
@@ -84,5 +86,10 @@ class PostTransformer extends TransformerAbstract
     public function includeComments($model)
     {
         return $this->collection($model->comments, new CommentTransformer());
+    }
+
+    public function includePostMetas($model)
+    {
+        return $this->collection($model->postMetas, new PostMetaTransformer());
     }
 }
