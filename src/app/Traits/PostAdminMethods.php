@@ -6,10 +6,12 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use VCComponent\Laravel\Post\Entities\PostSchema;
 use VCComponent\Laravel\Post\Events\PostCreatedByAdminEvent;
 use VCComponent\Laravel\Post\Events\PostDeletedEvent;
 use VCComponent\Laravel\Post\Events\PostUpdatedByAdminEvent;
 use VCComponent\Laravel\Post\Repositories\PostRepository;
+use VCComponent\Laravel\Post\Transformers\PostSchemaTransformer;
 use VCComponent\Laravel\Post\Transformers\PostTransformer;
 use VCComponent\Laravel\Post\Validators\PostValidatorInterface;
 use VCComponent\Laravel\Vicoders\Core\Exceptions\NotFoundException;
@@ -192,7 +194,7 @@ trait PostAdminMethods
     }
 
     public function store(Request $request)
-    {   
+    {
         $user = null;
         if (!empty(config('post.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
@@ -209,7 +211,7 @@ trait PostAdminMethods
         $this->validator->isSchemaValid($data['schema'], $schema_rules);
 
         $data['default']['author_id'] = $user ? $user->id : null;
-        
+
         $post       = $this->repository->create($data['default']);
         $post->type = $this->type;
         $post->save();
@@ -257,7 +259,7 @@ trait PostAdminMethods
 
         $this->validator->isValid($data['default'], 'RULE_ADMIN_UPDATE');
 
-        if (array_key_exists('schema' ,$data) && $schema_rules) {
+        if (array_key_exists('schema', $data) && $schema_rules) {
             $this->validator->isSchemaValid($data['schema'], $schema_rules);
         }
 
@@ -280,7 +282,7 @@ trait PostAdminMethods
     }
 
     public function destroy(Request $request, $id)
-    {   
+    {
         if (!empty(config('post.auth_middleware.admin'))) {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToDelete($user, $id)) {
@@ -292,7 +294,7 @@ trait PostAdminMethods
         if (!$post) {
             throw new NotFoundException(Str::title($this->type));
         }
-       
+
         $this->repository->delete($id);
 
         event(new PostDeletedEvent());
@@ -403,7 +405,7 @@ trait PostAdminMethods
         $query = $this->entity;
         $query = $this->applyQueryScope($query, 'type', $this->type);
         $trash = $query->onlyTrashed()->get();
- 
+
         return $this->response->collection($trash, new $this->transformer());
     }
 
@@ -482,22 +484,16 @@ trait PostAdminMethods
 
         $data = $request->all();
 
-        $data            = Carbon::parse($request->published_date)->format('Y-m-d');
+        $data                 = Carbon::parse($request->published_date)->format('Y-m-d');
         $post->published_date = $data;
         $post->save();
 
         return $this->response->item($post, new $this->transformer);
     }
+
     public function getFieldMeta()
     {
-        $type = $this->type;
-        $key  = ucwords($type) . 'Schema';
-        if (method_exists($this->entity, $key)) {
-            $fieldMeta = $this->entity->$key();
-        } else {
-            $fieldMeta = $this->entity->schema();
-        }
-
-        return response()->json(['data' => $fieldMeta]);
+        $data = PostSchema::ofPostType($this->type)->get();
+        return $this->response->collection($data, new PostSchemaTransformer());
     }
 }

@@ -20,7 +20,14 @@ use VCComponent\Laravel\Post\Repositories\DraftableRepository;
 use VCComponent\Laravel\Post\Repositories\DraftableRepositoryEloquent;
 use VCComponent\Laravel\Post\Repositories\PostRepository;
 use VCComponent\Laravel\Post\Repositories\PostRepositoryEloquent;
+use VCComponent\Laravel\Post\Repositories\PostSchemaRepository;
+use VCComponent\Laravel\Post\Repositories\PostSchemaRepositoryEloquent;
+use VCComponent\Laravel\Post\Repositories\PostSchemaRuleRepository;
+use VCComponent\Laravel\Post\Repositories\PostSchemaRuleRepositoryEloquent;
+use VCComponent\Laravel\Post\Repositories\PostSchemaTypeRepository;
+use VCComponent\Laravel\Post\Repositories\PostSchemaTypeRepositoryEloquent;
 use VCComponent\Laravel\Post\Services\Post;
+use VCComponent\Laravel\Post\Services\SchemaService;
 use VCComponent\Laravel\Post\Validators\PostValidator;
 use VCComponent\Laravel\Post\Validators\PostValidatorInterface;
 
@@ -70,9 +77,14 @@ class PostComponentProvider extends ServiceProvider
         $this->app->bind(PostRepository::class, PostRepositoryEloquent::class);
         $this->app->bind(PostValidatorInterface::class, PostValidator::class);
         $this->app->bind(DraftableRepository::class, DraftableRepositoryEloquent::class);
+        $this->app->bind(PostSchemaRepository::class, PostSchemaRepositoryEloquent::class);
+        $this->app->bind(PostSchemaTypeRepository::class, PostSchemaTypeRepositoryEloquent::class);
+        $this->app->bind(PostSchemaRuleRepository::class, PostSchemaRuleRepositoryEloquent::class);
 
         $this->registerViewModels();
         $this->registerControllers();
+
+        $this->app->bind('vcc.post.schema', SchemaService::class);
     }
 
     private function registerViewModels()
