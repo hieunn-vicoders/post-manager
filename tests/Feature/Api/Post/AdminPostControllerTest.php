@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Post\Test\Feature\Api\Post;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use VCComponent\Laravel\Post\Entities\Post;
+use VCComponent\Laravel\Post\Entities\PostSchema;
 use VCComponent\Laravel\Post\Test\TestCase;
 
 class AdminPostControllerTest extends TestCase
@@ -93,7 +94,7 @@ class AdminPostControllerTest extends TestCase
             ],
         ]);
     }
- 
+
     /**
      * @test
      */
@@ -101,12 +102,12 @@ class AdminPostControllerTest extends TestCase
     {
         $posts = factory(Post::class, 5)->create();
 
-        $posts = $posts->map(function($e) {
+        $posts = $posts->map(function ($e) {
             unset($e['updated_at']);
             unset($e['created_at']);
             return $e;
         })->toArray();
-        
+
         $listIds = array_column($posts, 'id');
         array_multisort($listIds, SORT_DESC, $posts);
 
@@ -115,7 +116,7 @@ class AdminPostControllerTest extends TestCase
         $response->assertStatus(200);
 
         foreach ($posts as $item) {
-           $this->assertDatabaseHas('posts', $item);
+            $this->assertDatabaseHas('posts', $item);
         }
     }
 
@@ -124,12 +125,29 @@ class AdminPostControllerTest extends TestCase
      */
     public function can_get_field_meta_post_by_admin_router()
     {
-        $post = new \VCComponent\Laravel\Post\Test\Stubs\Models\Post;
-    
-        $response = $this->call('GET', 'api/post-management/admin/posts/field-meta');
-       
+        factory(PostSchema::class)->states('posts')->create();
+
+        $response = $this->json('GET', 'api/post-management/admin/posts/field-meta');
         $response->assertStatus(200);
-        $response->assertJson(['data' => $post->schema()]);
+
+        $schemas = PostSchema::get()->map(function ($item) {
+            return [
+                'id'             => $item->id,
+                'name'           => $item->name,
+                'label'          => $item->label,
+                'schema_type_id' => $item->schema_type_id,
+                'schema_rule_id' => $item->schema_rule_id,
+                'post_type'      => $item->post_type,
+                'timestamps'     => [
+                    'created_at' => $item->created_at->toJSON(),
+                    'updated_at' => $item->updated_at->toJSON(),
+                ],
+            ];
+        })->toArray();
+
+        $response->assertJson([
+            'data' => $schemas,
+        ]);
     }
 
     /**
@@ -159,7 +177,7 @@ class AdminPostControllerTest extends TestCase
     {
         $posts = factory(Post::class, 5)->create();
 
-        $posts = $posts->map(function($e) {
+        $posts = $posts->map(function ($e) {
             unset($e['updated_at']);
             unset($e['created_at']);
             return $e;
@@ -185,14 +203,14 @@ class AdminPostControllerTest extends TestCase
         }
     }
 
-     /**
+    /**
      * @test
      */
     public function can_bulk_delete_posts_trash_by_admin()
     {
         $posts = factory(Post::class, 5)->create();
 
-        $posts = $posts->map(function($e) {
+        $posts = $posts->map(function ($e) {
             unset($e['updated_at']);
             unset($e['created_at']);
             return $e;
@@ -294,7 +312,7 @@ class AdminPostControllerTest extends TestCase
     {
         $posts = factory(Post::class, 5)->create();
 
-        $posts = $posts->map(function($e) {
+        $posts = $posts->map(function ($e) {
             unset($e['updated_at']);
             unset($e['created_at']);
             return $e;
@@ -351,7 +369,7 @@ class AdminPostControllerTest extends TestCase
 
     }
 
-     /**
+    /**
      * @test
      */
     public function can_change_published_date_a_post_by_admin()
@@ -365,19 +383,19 @@ class AdminPostControllerTest extends TestCase
         $response->assertJson(['data' => $data]);
     }
 
-     /**
+    /**
      * @test
      */
     public function can_get_all_post_by_admin()
     {
         $posts = factory(Post::class, 5)->create();
 
-        $posts = $posts->map(function($e) {
+        $posts = $posts->map(function ($e) {
             unset($e['updated_at']);
             unset($e['created_at']);
             return $e;
         })->toArray();
-        
+
         $listIds = array_column($posts, 'id');
         array_multisort($listIds, SORT_DESC, $posts);
 
@@ -393,7 +411,7 @@ class AdminPostControllerTest extends TestCase
         ]);
 
         foreach ($posts as $item) {
-           $this->assertDatabaseHas('posts', $item);
+            $this->assertDatabaseHas('posts', $item);
         }
     }
 
@@ -404,12 +422,12 @@ class AdminPostControllerTest extends TestCase
     {
         $posts = factory(Post::class, 5)->create();
 
-        $posts = $posts->map(function($e) {
+        $posts = $posts->map(function ($e) {
             unset($e['updated_at']);
             unset($e['created_at']);
             return $e;
         })->toArray();
-        
+
         $listIds = array_column($posts, 'id');
         $data    = ['ids' => $listIds, 'status' => 5];
 
@@ -453,7 +471,7 @@ class AdminPostControllerTest extends TestCase
     public function can_get_post_type_by_admin()
     {
         $response = $this->json('GET', 'api/post-management/admin/postTypes');
-        
+
         $entity       = new \VCComponent\Laravel\Post\Test\Stubs\Models\Post;
         $getpostTypes = $entity->postTypes();
         $response->assertJson([
@@ -468,7 +486,7 @@ class AdminPostControllerTest extends TestCase
     {
         $posts = factory(Post::class, 5)->create();
 
-        $posts = $posts->map(function($e) {
+        $posts = $posts->map(function ($e) {
             unset($e['updated_at']);
             unset($e['created_at']);
             return $e;
@@ -496,7 +514,7 @@ class AdminPostControllerTest extends TestCase
         unset($post['created_at']);
 
         $this->assertDatabaseHas('posts', $post);
-        
+
         $response = $this->call('GET', 'api/post-management/admin/posts/all');
         $response->assertJsonMissingExact([
             'meta' => [

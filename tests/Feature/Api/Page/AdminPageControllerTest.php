@@ -1,9 +1,10 @@
 <?php
 
-namespace VCComponent\Laravel\Post\Test\Feature\Api\Post;
+namespace VCComponent\Laravel\Post\Test\Feature\Api\Page;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use VCComponent\Laravel\Post\Entities\Post;
+use VCComponent\Laravel\Post\Entities\PostSchema;
 use VCComponent\Laravel\Post\Test\TestCase;
 
 class AdminPageControllerTest extends TestCase
@@ -16,7 +17,7 @@ class AdminPageControllerTest extends TestCase
     public function can_create_page_by_admin_router()
     {
         $data = factory(Post::class)->state('pages')->create()->toArray();
-        
+
         unset($data['updated_at']);
         unset($data['created_at']);
 
@@ -158,7 +159,7 @@ class AdminPageControllerTest extends TestCase
         $response->assertJsonFragment(['status' => 5]);
     }
 
-     /**
+    /**
      * @test
      */
     public function can_update_status_a_page_by_admin()
@@ -185,11 +186,28 @@ class AdminPageControllerTest extends TestCase
      */
     public function can_get_field_meta_pages_by_admin_router()
     {
-        $post = new \VCComponent\Laravel\Post\Test\Stubs\Models\Post;
-    
-        $response = $this->call('GET', 'api/post-management/admin/pages/field-meta');
+        factory(PostSchema::class)->states('pages')->create();
 
+        $response = $this->json('GET', 'api/post-management/admin/pages/field-meta');
         $response->assertStatus(200);
-        $response->assertJson(['data' => $post->pagesSchema()]);
+
+        $schemas = PostSchema::get()->map(function ($item) {
+            return [
+                'id'             => $item->id,
+                'name'           => $item->name,
+                'label'          => $item->label,
+                'schema_type_id' => $item->schema_type_id,
+                'schema_rule_id' => $item->schema_rule_id,
+                'post_type'      => $item->post_type,
+                'timestamps'     => [
+                    'created_at' => $item->created_at->toJSON(),
+                    'updated_at' => $item->updated_at->toJSON(),
+                ],
+            ];
+        })->toArray();
+
+        $response->assertJson([
+            'data' => $schemas,
+        ]);
     }
 }

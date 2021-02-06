@@ -33,12 +33,19 @@ $api->version('v1', function ($api) use ($postTypes) {
             $api->resource('posts', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface');
             $api->get('postTypes', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getType');
 
-
             $api->get('pages/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@list');
             $api->put('pages/status/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkUpdateStatus');
             $api->put('pages/{id}/status', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@updateStatusItem');
             $api->resource('pages', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface');
             $api->resource('draft', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\DraftableController');
+
+            $api->resource('post-schemas', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostSchemaController');
+
+            $api->get('post-schema-types', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostSchemaTypeController@index');
+            $api->get('post-schema-types/all', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostSchemaTypeController@list');
+
+            $api->get('post-schema-rules', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostSchemaRuleController@index');
+            $api->get('post-schema-rules/all', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostSchemaRuleController@list');
 
             if (count($postTypes)) {
                 foreach ($postTypes as $resource) {
