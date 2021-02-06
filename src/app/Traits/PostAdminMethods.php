@@ -26,7 +26,7 @@ trait PostAdminMethods
         $this->validator  = $validator;
         $this->type       = $this->getPostTypeFromRequest($request);
 
-        if (!empty(config('post.auth_middleware.admin'))) {
+        if (config('post.auth_middleware.admin.middleware') !== '') {
             $this->middleware(
                 config('post.auth_middleware.admin.middleware'),
                 ['except' => config('post.auth_middleware.admin.except')]
@@ -172,7 +172,7 @@ trait PostAdminMethods
 
     public function show(Request $request, $id)
     {
-        if (!empty(config('post.auth_middleware.admin'))) {
+        if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToShow($user, $id)) {
                 throw new PermissionDeniedException();
@@ -196,7 +196,7 @@ trait PostAdminMethods
     public function store(Request $request)
     {
         $user = null;
-        if (!empty(config('post.auth_middleware.admin'))) {
+        if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToCreate($user)) {
                 throw new PermissionDeniedException();
@@ -242,7 +242,7 @@ trait PostAdminMethods
 
     public function update(Request $request, $id)
     {
-        if (!empty(config('post.auth_middleware.admin'))) {
+        if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdateItem($user, $id)) {
                 throw new PermissionDeniedException();
@@ -283,7 +283,7 @@ trait PostAdminMethods
 
     public function destroy(Request $request, $id)
     {
-        if (!empty(config('post.auth_middleware.admin'))) {
+        if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToDelete($user, $id)) {
                 throw new PermissionDeniedException();
@@ -310,7 +310,7 @@ trait PostAdminMethods
 
     public function bulkUpdateStatus(Request $request)
     {
-        if (!empty(config('post.auth_middleware.admin'))) {
+        if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdate($user)) {
                 throw new PermissionDeniedException();
@@ -326,7 +326,7 @@ trait PostAdminMethods
 
     public function updateStatusItem(Request $request, $id)
     {
-        if (!empty(config('post.auth_middleware.admin'))) {
+        if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdateItem($user, $id)) {
                 throw new PermissionDeniedException();
@@ -349,7 +349,7 @@ trait PostAdminMethods
 
     public function bulkDelete(Request $request)
     {
-        if (!empty(config('post.auth_middleware.admin'))) {
+        if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdate($user)) {
                 throw new PermissionDeniedException();
@@ -468,7 +468,7 @@ trait PostAdminMethods
 
     public function changeDate(Request $request, $id)
     {
-        if (!empty(config('post.auth_middleware.admin'))) {
+        if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToUpdateItem($user, $id)) {
                 throw new PermissionDeniedException();
