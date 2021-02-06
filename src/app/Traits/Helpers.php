@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Post\Traits;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use VCComponent\Laravel\Post\Facades\Schema as PostSchemaFacade;
 
 trait Helpers
 {
@@ -64,17 +65,10 @@ trait Helpers
         if (!$request->has('status')) {
             $request_data['status'] = 1;
         }
-        if (count($entity->postTypes()) && $type !== 'posts') {
-            $schema_func = Str::camel($type . '_schema');
-            $schema      = collect($entity->$schema_func());
-        } else {
-            $schema = collect($entity->schema());
-        }
 
         $request_data_keys = $request_data->keys();
-        $schema_keys       = $schema->keys()->toArray();
-
-        $default_keys = $request_data_keys->diff($schema_keys)->all();
+        $schema_keys       = PostSchemaFacade::getKey($type)->toArray();
+        $default_keys      = $request_data_keys->diff($schema_keys)->all();
 
         $data            = [];
         $data['default'] = $request_data->filter(function ($value, $key) use ($default_keys) {

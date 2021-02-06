@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Post\Test\Feature\Api\PostType;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use VCComponent\Laravel\Post\Entities\Post;
+use VCComponent\Laravel\Post\Entities\PostSchema;
 use VCComponent\Laravel\Post\Test\TestCase;
 
 class AdminPostControllerTest extends TestCase
@@ -110,22 +111,39 @@ class AdminPostControllerTest extends TestCase
      */
     public function can_get_field_meta_post_type_by_admin_router()
     {
-        $post = new \VCComponent\Laravel\Post\Test\Stubs\Models\Post;
-    
-        $response = $this->call('GET', 'api/post-management/admin/about/field-meta');
+        factory(PostSchema::class)->states('about')->create();
 
+        $response = $this->json('GET', 'api/post-management/admin/about/field-meta');
         $response->assertStatus(200);
-        $response->assertJson(['data' => $post->aboutSchema()]);
+
+        $schemas = PostSchema::get()->map(function ($item) {
+            return [
+                'id'             => $item->id,
+                'name'           => $item->name,
+                'label'          => $item->label,
+                'schema_type_id' => $item->schema_type_id,
+                'schema_rule_id' => $item->schema_rule_id,
+                'post_type'      => $item->post_type,
+                'timestamps'     => [
+                    'created_at' => $item->created_at->toJSON(),
+                    'updated_at' => $item->updated_at->toJSON(),
+                ],
+            ];
+        })->toArray();
+
+        $response->assertJson([
+            'data' => $schemas,
+        ]);
     }
 
-     /**
+    /**
      * @test
      */
     public function can_bulK_delete_posts_type_trash_by_admin()
     {
         $posts = factory(Post::class, 5)->state('about')->create();
 
-        $posts = $posts->map(function($e) {
+        $posts = $posts->map(function ($e) {
             unset($e['updated_at']);
             unset($e['created_at']);
             return $e;
@@ -181,7 +199,7 @@ class AdminPostControllerTest extends TestCase
     {
         $posts = factory(Post::class, 5)->state('about')->create();
 
-        $posts = $posts->map(function($e) {
+        $posts = $posts->map(function ($e) {
             unset($e['updated_at']);
             unset($e['created_at']);
             return $e;
@@ -207,14 +225,14 @@ class AdminPostControllerTest extends TestCase
         }
     }
 
-     /**
+    /**
      * @test
      */
     public function can_bulk_delete_posts_trash_by_admin()
     {
         $posts = factory(Post::class, 5)->state('about')->create();
 
-        $posts = $posts->map(function($e) {
+        $posts = $posts->map(function ($e) {
             unset($e['updated_at']);
             unset($e['created_at']);
             return $e;
@@ -243,7 +261,7 @@ class AdminPostControllerTest extends TestCase
         }
     }
 
-     /**
+    /**
      * @test
      */
     public function can_delete_a_posts_type_trash_by_admin()
@@ -284,14 +302,14 @@ class AdminPostControllerTest extends TestCase
         $response->assertJson(['data' => [$post]]);
     }
 
-     /**
+    /**
      * @test
      */
     public function can_bulk_restore_posts_type_by_admin_router()
     {
         $posts = factory(Post::class, 5)->state('about')->create();
 
-        $posts = $posts->map(function($e) {
+        $posts = $posts->map(function ($e) {
             unset($e['updated_at']);
             unset($e['created_at']);
             return $e;
@@ -368,19 +386,19 @@ class AdminPostControllerTest extends TestCase
         ]);
     }
 
-     /**
+    /**
      * @test
      */
     public function can_bulk_update_status_posts_type_by_admin()
     {
         $posts = factory(Post::class, 5)->state('about')->create();
 
-        $posts = $posts->map(function($e) {
+        $posts = $posts->map(function ($e) {
             unset($e['updated_at']);
             unset($e['created_at']);
             return $e;
         })->toArray();
-        
+
         $listIds = array_column($posts, 'id');
         $data    = ['ids' => $listIds, 'status' => 5];
 
@@ -396,7 +414,7 @@ class AdminPostControllerTest extends TestCase
         $response->assertJsonFragment(['status' => 5]);
     }
 
-     /**
+    /**
      * @test
      */
     public function can_update_status_a_post_type_by_admin()
