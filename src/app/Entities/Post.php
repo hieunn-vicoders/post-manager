@@ -35,7 +35,8 @@ class Post extends Model implements Transformable, PostSchema, PostManagement
         'published_date',
         'author_id',
         'thumbnail',
-        'is_hot'
+        'is_hot',
+        'slug',
     ];
 
     public function sluggable()
