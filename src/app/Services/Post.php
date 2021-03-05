@@ -68,4 +68,43 @@ class Post
         }
         return $this->hotNewsQuery($type, $value);
     }
+       public function getRelatedPosts($post_id, $post_type, $number, $pagination = false, $order_by="id", $order="desc", $is_hot = 0, $status = 1)
+    {
+        if ($this->cache === true) {
+            if (Cache::has('getRelatedPosts') && Cache::get('getRelatedPosts')->count() !== 0) {
+                return Cache::get('getRelatedPosts');
+            }
+            return Cache::remember('getRelatedPosts', $this->timeCache, function () use ($post_id, $post_type, $number, $pagination, $order_by, $order, $is_hot, $status) {
+                return $this->getRelatedPostsQuery($post_id, $post_type, $number, $pagination, $order_by, $order, $is_hot, $status);
+            });
+        }
+        return $this->getRelatedPostsQuery($post_id, $post_type, $number, $pagination, $order_by, $order, $is_hot, $status);
+    }
+
+     public function getPosts($post_type,$category_id, $number, $pagination = false, $order_by="id", $order="desc", $is_hot = 0, $status = 1)
+    {
+        if ($this->cache === true) {
+            if (Cache::has('getPosts') && Cache::get('getPosts')->count() !== 0) {
+                return Cache::get('getPosts');
+            }
+            return Cache::remember('getPosts', $this->timeCache, function () use ($post_type, $category_id, $number, $pagination,$order_by, $order,$is_hot, $status) {
+                return $this->getPostsQuery($post_type, $category_id, $number, $pagination,$order_by, $order,$is_hot, $status);
+            });
+        }
+        return $this->getPostsQuery($post_type, $category_id, $number, $pagination,$order_by, $order,$is_hot, $status);
+    }
+
+     public function getSearchResult($key_word,$number,$post_type,$category_id,$pagination= "false",$order_by="id", $order="desc", $is_hot = false, $status =1)
+    {
+        if ($this->cache === true) {
+            if (Cache::has('getSearchResult') && Cache::get('getSearchResult')->count() !== 0) {
+                return Cache::get('getSearchResult');
+            }
+            return Cache::remember('getSearchResult', $this->timeCache, function () use ($key_word,$number,$post_type,$category_id,$pagination,$order_by,$order, $is_hot,$status) {
+                return $this->getSearchResultQuery($key_word,$number,$post_type,$category_id,$pagination,$order_by,$order, $is_hot,$status);
+            });
+        }
+        return $this->getSearchResultQuery($key_word,$number,$post_type,$category_id,$pagination,$order_by,$order, $is_hot,$status);
+    }
+
 }
