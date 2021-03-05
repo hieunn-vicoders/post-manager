@@ -55,10 +55,6 @@ class Post extends Model implements Transformable, PostSchema, PostManagement
                 'type' => 'string',
                 'rule' => [],
             ],
-            'is_hot'    => [
-                'type' => 'integer',
-                'rule' => [],
-            ],
         ];
     }
 
