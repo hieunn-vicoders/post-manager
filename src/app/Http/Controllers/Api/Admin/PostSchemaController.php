@@ -8,7 +8,7 @@ use VCComponent\Laravel\Post\Transformers\PostSchemaTransformer;
 use VCComponent\Laravel\Post\Validators\PostSchemaValidator;
 
 use VCComponent\Laravel\Vicoders\Core\Controllers\ApiController;
-
+use VCComponent\Laravel\Post\Entities\PostMeta;
 class PostSchemaController extends ApiController
 {
     protected $repository;
@@ -76,19 +76,19 @@ class PostSchemaController extends ApiController
     {
         $this->validator->isValid($request, 'RULE_ADMIN_UPDATE');
 
-        $this->repository->findById($id);
+        $schema_updating = $this->repository->findById($id);
 
         $data = $request->all();
 
+        PostMeta::where('key', $schema_updating->name)->update(['key' => $request->name]);
         $schema = $this->repository->update($data, $id);
-
         return $this->response->item($schema, new $this->transformer);
     }
 
     public function destroy($id)
     {
         $schema = $this->repository->findById($id);
-
+        PostMeta::where('key', $schema->name)->delete();
         $schema->delete();
 
         return $this->success();
