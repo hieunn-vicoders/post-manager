@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use VCComponent\Laravel\Post\Entities\PostSchemaType;
 
-class SeedPostSchemaTypes extends Migration
+class SeedPostSchemaTypesAddImage extends Migration
 {
     /**
      * Run the migrations.
@@ -17,17 +17,8 @@ class SeedPostSchemaTypes extends Migration
     {
         PostSchemaType::insert([
             [
-                "name" => "text",
-            ],
-            [
-                "name" => "textarea",
-            ],
-            [
-                "name" => "tinyMCE",
-            ],
-            [
-                "name" => "checkbox",
-            ],
+                "name" => "image",
+            ]
         ]);
     }
 
@@ -38,6 +29,5 @@ class SeedPostSchemaTypes extends Migration
      */
     public function down()
     {
-
     }
 }
