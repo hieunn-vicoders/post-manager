@@ -28,6 +28,9 @@ class SeedPostSchemaTypes extends Migration
             [
                 "name" => "checkbox",
             ],
+            [
+                "name" => "image",
+            ],
         ]);
     }
 
