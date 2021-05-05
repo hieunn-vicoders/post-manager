@@ -28,33 +28,44 @@ class Post
             $this->timeCache = config('post.cache')['minutes'] ? config('post.cache')['minutes'] * 60 : $this->cacheMinutes * 60;
         }
     }
-
-    public function relatedPosts($post, $type, $value = 5)
-    {
+    public function get_post_url($post_id) {
         if ($this->cache === true) {
-            if (Cache::has('relatedPosts') && Cache::get('relatedPosts')->count() !== 0) {
-                return Cache::get('relatedPosts');
+            if (Cache::has('get_post_url') && Cache::get('get_post_url')->count() !== 0) {
+                return Cache::get('get_post_url');
             }
-            return Cache::remember('relatedPosts', $this->timeCache, function () use ($post, $type, $value) {
-                return $this->relatedPostsQuery($post, $type, $value);
+            return Cache::remember('get_post_url', $this->timeCache, function () use ($post_id) {
+                return $this->getPostUrlQuery($post_id);
             });
         }
-        return $this->relatedPostsQuery($post, $type, $value);
+        return $this->getPostUrlQuery($post_id);
+    }
+    public function get_posts($post_type, $category_slug = null, $number_post = 10, $order_by = 'id', $order = 'desc', $paginate = false)
+    {
+        if ($this->cache === true) {
+            if (Cache::has('get_posts') && Cache::get('get_posts')->count() !== 0) {
+                return Cache::get('get_posts');
+            }
+            return Cache::remember('get_posts', $this->timeCache, function () use ($post_type, $category_slug, $number_post,$order_by, $order, $paginate) {
+                return $this->getPostsQuery($post_type, $category_slug, $number_post,$order_by, $order, $paginate);
+            });
+        }
+        return $this->getPostsQuery($post_type, $category_slug, $number_post,$order_by, $order, $paginate);
+    }
+    public function get_related_posts($post_id, $post_type, $category_slug = null, $number_post = 4, $order_by = 'id', $order = 'desc')
+    {
+        if ($this->cache === true) {
+            if (Cache::has('get_related_posts') && Cache::get('get_related_posts')->count() !== 0) {
+                return Cache::get('get_related_posts');
+            }
+            return Cache::remember('get_related_posts', $this->timeCache, function () use ($post_id, $post_type, $category_slug, $number_post, $order_by, $order) {
+                return $this->relatedPostsQuery($post_id, $post_type, $category_slug, $number_post, $order_by, $order);
+            });
+        }
+        return $this->relatedPostsQuery($post_id, $post_type, $category_slug, $number_post, $order_by, $order);
 
     }
 
-    public function getLatestPosts($type, $value = 5, $perPage = false)
-    {
-        if ($this->cache === true) {
-            if (Cache::has('getLatestPosts') && Cache::get('getLatestPosts')->count() !== 0) {
-                return Cache::get('getLatestPosts');
-            }
-            return Cache::remember('getLatestPosts', $this->timeCache, function () use ($type, $value, $perPage) {
-                return $this->getLatestPostsQuery($type, $value, $perPage);
-            });
-        }
-        return $this->getLatestPostsQuery($type, $value, $perPage);
-    }
+
 
     public function hotNews($type, $value = 5)
     {

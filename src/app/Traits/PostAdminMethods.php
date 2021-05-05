@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use VCComponent\Laravel\Post\Entities\PostSchema;
+use VCComponent\Laravel\Post\Entities\Post;
 use VCComponent\Laravel\Post\Events\PostCreatedByAdminEvent;
 use VCComponent\Laravel\Post\Events\PostDeletedEvent;
 use VCComponent\Laravel\Post\Events\PostUpdatedByAdminEvent;
@@ -172,6 +173,7 @@ trait PostAdminMethods
 
     public function show(Request $request, $id)
     {
+
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
             if (!$this->entity->ableToShow($user, $id)) {
@@ -180,6 +182,7 @@ trait PostAdminMethods
         }
 
         $post = $this->repository->findWhere(['id' => $id])->first();
+
         if (!$post) {
             throw new NotFoundException(($this->type) . ' entity');
         }
@@ -195,6 +198,7 @@ trait PostAdminMethods
 
     public function store(Request $request)
     {
+
         $user = null;
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
@@ -204,6 +208,7 @@ trait PostAdminMethods
         }
 
         $data           = $this->filterPostRequestData($request, $this->entity, $this->type);
+        // dd($data);
         $schema_rules   = $this->validator->getSchemaRules($this->entity, $this->type);
         $no_rule_fields = $this->validator->getNoRuleFields($this->entity, $this->type);
 
@@ -234,10 +239,10 @@ trait PostAdminMethods
                 ]);
             }
         }
-
+        $data = $request->all();
         event(new PostCreatedByAdminEvent($post));
 
-        return $this->response->item($post, new $this->transformer);
+        return $this->response->item($post, new $this->transformer([],$data));
     }
 
     public function update(Request $request, $id)
@@ -495,5 +500,28 @@ trait PostAdminMethods
     {
         $data = PostSchema::ofPostType($this->type)->get();
         return $this->response->collection($data, new PostSchemaTransformer());
+    }
+    public function addMediaPost($id, $image_path)
+    {
+        $query = $this->entity;
+        $query = $this->applyQueryScope($query, 'type', $this->type);
+
+        $post = $query->where('id', $id)->first();
+        if (!$post) {
+            throw new NotFoundException('Post');
+        }
+        return $post->addMedia($image_path)->preservingOriginal()->toMediaCollection();
+    }
+
+    public function getMediaPost($id)
+    {
+        $query = $this->entity;
+        $query = $this->applyQueryScope($query, 'type', $this->type);
+
+        $post = $query->where('id', $id)->first();
+        if (!$post) {
+            throw new NotFoundException('Post');
+        }
+        return $post->getMedia();
     }
 }

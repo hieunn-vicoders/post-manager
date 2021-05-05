@@ -2,6 +2,7 @@
 
 namespace VCComponent\Laravel\Post\Http\Controllers\Web;
 
+use App\Entities\Post;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use VCComponent\Laravel\Post\Contracts\ViewPostDetailControllerInterface;
@@ -75,4 +76,6 @@ class PostDetailController extends Controller implements ViewPostDetailControlle
     {
         return [];
     }
+
+
 }

@@ -15,10 +15,15 @@ use VCComponent\Laravel\Post\Contracts\PostSchema;
 use VCComponent\Laravel\Post\Traits\PostManagementTrait;
 use VCComponent\Laravel\Post\Traits\PostQueryTrait;
 use VCComponent\Laravel\Post\Traits\PostSchemaTrait;
+use Spatie\MediaLibrary\HasMedia\HasMedia;
+use VCComponent\Laravel\MediaManager\HasMediaTrait;
+use Spatie\MediaLibrary\Models\Media;
+use Illuminate\Support\Facades\DB;
 
-class Post extends Model implements Transformable, PostSchema, PostManagement
+
+class Post extends Model implements Transformable, PostSchema, PostManagement, HasMedia
 {
-    use TransformableTrait, PostSchemaTrait, PostManagementTrait, PostQueryTrait, Sluggable, SluggableScopeHelpers, SoftDeletes, HasCategoriesTrait;
+    use TransformableTrait, PostSchemaTrait, PostManagementTrait, PostQueryTrait, Sluggable, SluggableScopeHelpers, SoftDeletes, HasCategoriesTrait, HasMediaTrait;
 
     const STATUS_PENDING   = 0;
     const STATUS_PUBLISHED = 1;
@@ -55,9 +60,22 @@ class Post extends Model implements Transformable, PostSchema, PostManagement
                 'type' => 'string',
                 'rule' => [],
             ],
+            'images_url' => [
+              'type' => 'json',
+              'rule' => []
+            ]
         ];
     }
-
+    public function registerMediaConversions(Media $media = null)
+    {
+        $media_dimension = DB::table('media_dimensions')->where('model', 'post')->get();
+        foreach ($media_dimension as $item) {
+            $this->addMediaConversion($item->name)
+            ->width($item->width)
+            ->height($item->height)
+            ->sharpen(10);
+        }
+    }
     public function getLimitDescription($limit = 30)
     {
         return Str::limit($this->description, $limit);
