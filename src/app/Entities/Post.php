@@ -15,15 +15,16 @@ use VCComponent\Laravel\Post\Contracts\PostSchema;
 use VCComponent\Laravel\Post\Traits\PostManagementTrait;
 use VCComponent\Laravel\Post\Traits\PostQueryTrait;
 use VCComponent\Laravel\Post\Traits\PostSchemaTrait;
-use Spatie\MediaLibrary\HasMedia\HasMedia;
-use VCComponent\Laravel\MediaManager\HasMediaTrait;
 use Spatie\MediaLibrary\Models\Media;
 use Illuminate\Support\Facades\DB;
-
-
-class Post extends Model implements Transformable, PostSchema, PostManagement, HasMedia
+use Spatie\MediaLibrary\HasMedia\HasMedia;
+use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use VCComponent\Laravel\Post\Contracts\PostUtilitiesInterface;
+use VCComponent\Laravel\Post\Traits\PostUtilitiesTrait;
+//use VCComponent\Laravel\MediaManager\HasMediaTrait;
+class Post extends Model implements HasMedia, Transformable, PostSchema, PostManagement, PostUtilitiesInterface
 {
-    use TransformableTrait, PostSchemaTrait, PostManagementTrait, PostQueryTrait, Sluggable, SluggableScopeHelpers, SoftDeletes, HasCategoriesTrait, HasMediaTrait;
+    use TransformableTrait, PostSchemaTrait, PostManagementTrait, PostQueryTrait, Sluggable, SluggableScopeHelpers, SoftDeletes, HasCategoriesTrait, HasMediaTrait, PostUtilitiesTrait;
 
     const STATUS_PENDING   = 0;
     const STATUS_PUBLISHED = 1;
@@ -89,5 +90,9 @@ class Post extends Model implements Transformable, PostSchema, PostManagement, H
     public function scopeHot($query)
     {
         return $query->where('is_hot', self::HOT);
+    }
+    public function categories()
+    {
+        return $this->morphToMany(Category::class, 'categoryable')->with('languages');
     }
 }
