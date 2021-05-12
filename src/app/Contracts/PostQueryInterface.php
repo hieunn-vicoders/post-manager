@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Post\Contracts;
 
 interface PostQueryInterface
 {
-    public function all($columns = ['*']);
+    public function findByField($field, $value, $columns = ['*']);
+    public function findWhere(array $where, $columns = ['*']);
 
 }

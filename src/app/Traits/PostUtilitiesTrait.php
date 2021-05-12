@@ -25,6 +25,7 @@ trait PostUtilitiesTrait
         return $this->thumbnail;
     }
 
+    // get any field by post
     public function __get($field)
     {
         if($this->getAttribute($field))

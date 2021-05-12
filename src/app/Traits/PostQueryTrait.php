@@ -58,6 +58,38 @@ trait PostQueryTrait
             throw new NotFoundException(Str::title($type));
         }
     }
+    /**
+     * Find data by a fields
+     *
+     * @param string $type
+     * @param int $id
+     * @return self
+     */
+    public static function findByField($field, $value = null, $columns = ['*'], $type = 'posts')
+    {
+        try {
+            return self::ofType($type)->where($field, '=', $value)->get($columns);
+        } catch (Exception $e) {
+            throw new NotFoundException(Str::title($type));
+        }
+
+
+    }
+
+    /**
+     * Find data by multiple fields
+     *
+     * @param string $type
+     * @param int $id
+     * @return self
+     */
+    public function findWhere(array $where, $columns = ['*'], $type = 'posts') {
+        try {
+            return self::ofType($type)->where($where)->get($columns);
+        } catch (Exception $e) {
+            throw new NotFoundException(Str::title($type));
+        }
+    }
 
     /**
      * Get post meta data
