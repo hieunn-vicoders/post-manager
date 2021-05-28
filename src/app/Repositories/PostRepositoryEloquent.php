@@ -107,4 +107,93 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $result;
     }
 
+    public function getRelatedPostsQuery($post_id, $post_type, $number, $order_by, $order, $is_hot, $status) {
+        $query = $this->getEntity()->where('type', $post_type)
+            ->where('id', '<>', $post_id)
+            ->orderBy($order_by,$order)
+            ->where('is_hot',$is_hot)
+            ->where('status', $status)
+            ->with('languages');
+        if($number > 0) {
+            return $query->limit($number)->get();
+        }
+        return $query->get();
+
+    }
+    public function getRelatedPostsQueryPaginate($post_id, $post_type, $number, $order_by, $order, $is_hot, $status) {
+        $query = $this->getEntity()->where('type', $post_type)
+            ->where('id', '<>', $post_id)
+            ->orderBy($order_by,$order)
+            ->where('is_hot',$is_hot)
+            ->where('status', $status)
+            ->with('languages')
+            ->paginate($number);
+        return $query;
+
+    }
+    public function getPostsQuery($post_type, $category_id, $number, $order_by, $order,$is_hot, $status) {
+        $query = $this->getEntity()->where('type', $post_type)
+            ->orderBy($order_by,$order)
+            ->where('is_hot',$is_hot)
+            ->where('status', $status)
+            ->with('languages');
+        if ($category_id != '') {
+                $query = $query->whereHas('categories', function ($q) use ($category_id) {
+                    $q->where('categories.id', $category_id); });
+            }
+        if($number > 0) {
+            return $query->limit($number)->get();
+        }
+        return $query->get();
+    }
+    public function getPostsQueryPaginate($post_type, $category_id, $number, $order_by, $order,$is_hot, $status) {
+        $query = $this->getEntity()->where('type', $post_type)
+            ->orderBy($order_by,$order)
+            ->where('is_hot',$is_hot)
+            ->where('status', $status)
+            ->with('languages');
+        if ($category_id != '') {
+                $query = $query->whereHas('categories', function ($q) use ($category_id) {
+                    $q->where('categories.id', $category_id); });
+        }
+        return $query->paginate($number);
+    }
+
+    public function getSearchResultQuery($key_word,$number,$post_type,$category_id,$order_by,$order, $is_hot, $status) {
+
+        $query = $this->getEntity()->orderBy($order_by,$order)
+            ->where('is_hot',$is_hot)
+            ->where('status', $status)
+            ->with('languages');
+            if ($post_type != '') {
+                $query = $query->where('type', $post_type);
+            }
+            if ($category_id != '') {
+                $query = $query->whereHas('categories', function ($q) use ($category_id) {
+                    $q->where('categories.id', $category_id); });
+            }
+            $query->where('title', 'like', "%{$key_word}%")->orWhere('description', "%{$key_word}%");
+        if($number > 0) {
+            return $query->limit($number)->get();
+        }
+        return $query->get();
+    }
+    public function getSearchResultQueryPaginate($key_word,$number,$post_type,$category_id,$order_by,$order, $is_hot, $status) {
+
+        $query = $this->getEntity()->orderBy($order_by,$order)
+            ->where('is_hot',$is_hot)
+            ->where('status', $status)
+            ->with('languages');
+            if ($post_type != '') {
+                $query = $query->where('type', $post_type);
+            }
+            if ($category_id != '') {
+                $query = $query->whereHas('categories', function ($q) use ($category_id) {
+                    $q->where('categories.id', $category_id); });
+            }
+        return $query->where('title', 'like', "%{$key_word}%")->orWhere('description', "%{$key_word}%")
+           ->paginate($number);
+
+    }
+
 }
