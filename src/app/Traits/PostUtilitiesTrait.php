@@ -4,6 +4,10 @@ namespace VCComponent\Laravel\Post\Traits;
 
 trait PostUtilitiesTrait
 {
+    public function getID()
+    {
+        return $this->id;
+    }
     public function getTitle()
     {
         return $this->title;
@@ -24,6 +28,23 @@ trait PostUtilitiesTrait
     {
         return $this->thumbnail;
     }
+    public function getStatus()
+    {
+        return $this->status;
+    }
+    public function getIsHot()
+    {
+        return $this->is_hot;
+    }
+    public function getCreateDate()
+    {
+        return $this->thumbnail;
+    }
+    public function getType()
+    {
+        return $this->type;
+    }
+
 
     // get any field by post
     public function __get($field)

@@ -501,27 +501,4 @@ trait PostAdminMethods
         $data = PostSchema::ofPostType($this->type)->get();
         return $this->response->collection($data, new PostSchemaTransformer());
     }
-    public function addMediaPost($id, $image_path)
-    {
-        $query = $this->entity;
-        $query = $this->applyQueryScope($query, 'type', $this->type);
-
-        $post = $query->where('id', $id)->first();
-        if (!$post) {
-            throw new NotFoundException('Post');
-        }
-        return $post->addMedia($image_path)->preservingOriginal()->toMediaCollection();
-    }
-
-    public function getMediaPost($id)
-    {
-        $query = $this->entity;
-        $query = $this->applyQueryScope($query, 'type', $this->type);
-
-        $post = $query->where('id', $id)->first();
-        if (!$post) {
-            throw new NotFoundException('Post');
-        }
-        return $post->getMedia();
-    }
 }

@@ -2,7 +2,7 @@
 
 return [
 
-    'namespace'       => env('POST_COMPONENT_NAMESPACE', ''),
+    'namespace'       => env('POST_COMPONENT_NAMESPACE', 'post-management'),
 
     'models'          => [
         'post' => VCComponent\Laravel\Post\Entities\Post::class,
@@ -22,12 +22,12 @@ return [
 
     'auth_middleware' => [
         'admin'    => [
-            'middleware' => '',
-            'except'     => [],
+            'middleware' => 'jwt.auth',
+            'except'     => ['index'],
         ],
         'frontend' => [
-            'middleware' => '',
-            'except'     => [],
+            'middleware' => 'jwt.auth',
+            'except'     => ['index'],
         ],
     ],
     'cache'           => [
