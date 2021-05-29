@@ -10,7 +10,8 @@ use Prettus\Repository\Eloquent\BaseRepository;
 use VCComponent\Laravel\Post\Entities\Post;
 use VCComponent\Laravel\Post\Repositories\PostRepository;
 use VCComponent\Laravel\Vicoders\Core\Exceptions\NotFoundException;
-
+use Exception;
+use Illuminate\Support\Str;
 /**
  * Class PostRepositoryEloquent.
  *
@@ -45,6 +46,47 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         $this->pushCriteria(app(RequestCriteria::class));
     }
 
+    /**
+     * Find data by a fields
+     *
+     * @param string $type
+     * @param int $id
+     * @return self
+     */
+    public function findByField($field, $value = null, $columns = ['*'], $type = 'posts')
+    {
+        try {
+            return $this->model->ofType($type)->where($field, '=', $value)->get($columns);
+        } catch (Exception $e) {
+            throw new NotFoundException($e);
+        }
+
+
+    }
+
+    /**
+     * Find data by multiple fields
+     *
+     * @param string $type
+     * @param int $id
+     * @return self
+     */
+    public function findWhere(array $where, $columns = ['*'], $type = 'posts') {
+        try {
+            return $this->model->ofType($type)->where($where)->get($columns);
+        } catch (Exception $e) {
+            throw new NotFoundException($e);
+        }
+    }
+
+    public function getPostsAll( $type = 'posts') {
+        try {
+            return $this->model->ofType($type)->get();
+        } catch (Exception $e) {
+            throw new NotFoundException($e);
+        }
+    }
+
     public function getWithPagination($filters, $type)
     {
         $request = App::make(Request::class);
@@ -61,6 +103,25 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
             });
 
         return $items;
+    }
+
+    public function getPostByID( $post_id) {
+        return $this->model->where('id', $post_id)->first();
+    }
+    public function getPostMedias( $post_id, $image_dimension) {
+        $post = $this->model->where('id', $post_id)->first();
+        $images=[];
+        $count = 0;
+        foreach ($post->getMedia() as $item) {
+            $images[$count] = $item->getUrl($image_dimension);
+            $count++;
+        }
+
+        return $images;
+    }
+    public function getPostUrl($post_id){
+        $post_query = $this->model->where('id', $post_id)->first();
+        return '/'.$post_query->type.'/'.$post_query->slug;
     }
 
     public function restore($id)
@@ -107,6 +168,8 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $result;
     }
 
+
+
     public function getRelatedPostsQuery($post_id, $post_type, $number, $order_by, $order, $is_hot, $status) {
         $query = $this->getEntity()->where('type', $post_type)
             ->where('id', '<>', $post_id)
@@ -120,6 +183,8 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->get();
 
     }
+
+
     public function getRelatedPostsQueryPaginate($post_id, $post_type, $number, $order_by, $order, $is_hot, $status) {
         $query = $this->getEntity()->where('type', $post_type)
             ->where('id', '<>', $post_id)

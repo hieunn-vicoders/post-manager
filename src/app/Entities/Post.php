@@ -55,10 +55,10 @@ class Post extends Model implements Transformable, PostSchema, PostManagement
                 'type' => 'string',
                 'rule' => [],
             ],
-            'is_hot'    => [
-                'type' => 'integer',
-                'rule' => [],
-            ],
+            'images_url' => [
+              'type' => 'json',
+              'rule' => []
+            ]
         ];
     }
 
@@ -75,5 +75,9 @@ class Post extends Model implements Transformable, PostSchema, PostManagement
     public function scopeHot($query)
     {
         return $query->where('is_hot', self::HOT);
+    }
+    public function categories()
+    {
+        return $this->morphToMany(Category::class, 'categoryable')->with('languages');
     }
 }
