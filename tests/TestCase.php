@@ -9,7 +9,6 @@ use VCComponent\Laravel\Post\Entities\Post;
 use VCComponent\Laravel\Post\Providers\PostComponentProvider;
 use VCComponent\Laravel\Post\Providers\PostComponentRouteProvider;
 use VCComponent\Laravel\Post\Transformers\PostTransformer;
-
 class TestCase extends OrchestraTestCase
 {
     /**
@@ -63,8 +62,12 @@ class TestCase extends OrchestraTestCase
             'post' => \VCComponent\Laravel\Post\Transformers\PostTransformer::class,
         ]);
         $app['config']->set('post.auth_middleware', [
-            'admin'    => [],
-            'frontend' => [],
+            'admin'    => [
+                'middleware' => ''
+            ],
+            'frontend' => [
+                'middleware' => ''
+            ],
         ]);
         $app['config']->set('api', [
             'standardsTree'      => 'x',

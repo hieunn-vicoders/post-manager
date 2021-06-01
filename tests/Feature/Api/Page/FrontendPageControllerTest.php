@@ -18,7 +18,6 @@ class FrontendPageControllerTest extends TestCase
         $data = factory(Post::class)->state('pages')->make()->toArray();
 
         $response = $this->json('POST', 'api/post-management/pages', $data);
-
         $response->assertStatus(200);
         $response->assertJson(['data' => $data]);
 
@@ -113,7 +112,7 @@ class FrontendPageControllerTest extends TestCase
         unset($post['created_at']);
 
         $this->assertDatabaseHas('posts', $post);
-        
+
         $response = $this->call('GET', 'api/post-management/pages/all');
         $response->assertJsonMissingExact([
             'meta' => [

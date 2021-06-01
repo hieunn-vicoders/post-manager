@@ -53,15 +53,13 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
      * @param int $id
      * @return self
      */
-    public function findByField($field, $value = null, $columns = ['*'], $type = 'posts')
+    public function findByField($field, $value = null, $type = 'posts')
     {
         try {
-            return $this->model->ofType($type)->where($field, '=', $value)->get($columns);
+            return $this->model->ofType($type)->where($field, '=', $value)->get();
         } catch (Exception $e) {
-            throw new NotFoundException($e);
+            throw new NotFoundException('post not found');
         }
-
-
     }
 
     /**
@@ -71,9 +69,9 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
      * @param int $id
      * @return self
      */
-    public function findWhere(array $where, $columns = ['*'], $type = 'posts') {
+    public function findByWhere(array $where, $type = 'posts') {
         try {
-            return $this->model->ofType($type)->where($where)->get($columns);
+            return $this->model->ofType($type)->where($where)->get();
         } catch (Exception $e) {
             throw new NotFoundException($e);
         }
@@ -105,10 +103,10 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $items;
     }
 
-    public function getPostByID( $post_id) {
+    public function getPostByID($post_id) {
         return $this->model->where('id', $post_id)->first();
     }
-    public function getPostMedias( $post_id, $image_dimension) {
+    public function getPostMedias( $post_id, $image_dimension='') {
         $post = $this->model->where('id', $post_id)->first();
         $images=[];
         $count = 0;
@@ -116,12 +114,12 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
             $images[$count] = $item->getUrl($image_dimension);
             $count++;
         }
-
         return $images;
     }
+
     public function getPostUrl($post_id){
-        $post_query = $this->model->where('id', $post_id)->first();
-        return '/'.$post_query->type.'/'.$post_query->slug;
+        $post = $this->model->where('id', $post_id)->first();
+        return '/'.$post->type.'/'.$post->slug;
     }
 
     public function restore($id)
