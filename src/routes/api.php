@@ -30,11 +30,9 @@ $api->version('v1', function ($api) use ($postTypes) {
             $api->put('posts/status/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkUpdateStatus');
             $api->put('posts/{id}/status', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@updateStatusItem');
             $api->delete('posts/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDelete');
-
             $api->resource('posts', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface');
             $api->get('postTypes', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getType');
-            $api->get('posts/{id}/add-media', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@addMediaPost');
-            $api->get('posts/{id}/get-media', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getMediaPost');
+
             $api->get('pages/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@list');
             $api->put('pages/status/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkUpdateStatus');
             $api->put('pages/{id}/status', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@updateStatusItem');
@@ -65,8 +63,6 @@ $api->version('v1', function ($api) use ($postTypes) {
                     $api->put($resource . '/status/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkUpdateStatus');
                     $api->put($resource . '/{id}/status', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@updateStatusItem');
                     $api->resource($resource, 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface');
-                    $api->get($resource .'/{id}/add-media', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@addMediaPost');
-                    $api->get($resource .'/{id}/get-media', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getMediaPost');
                 }
             }
         });

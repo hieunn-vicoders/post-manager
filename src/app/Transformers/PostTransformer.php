@@ -28,7 +28,6 @@ class PostTransformer extends TransformerAbstract
 
     public function transform($model)
     {
-
         $transform = [
             'id'             => (int) $model->id,
             'title'          => $model->title,
@@ -41,7 +40,7 @@ class PostTransformer extends TransformerAbstract
             'is_hot'         => $model->is_hot,
             'order'          => (int) $model->order,
             'status'         => (int) $model->status,
-            'published_date' => $model->published_date
+            'published_date' => $model->published_date,
         ];
 
         if ($model->postMetas->count()) {
@@ -54,6 +53,7 @@ class PostTransformer extends TransformerAbstract
             'created_at' => $model->created_at,
             'updated_at' => $model->updated_at,
         ];
+
         return $transform;
     }
 
@@ -74,7 +74,6 @@ class PostTransformer extends TransformerAbstract
         if ($model->media) {
             return $this->collection($model->media, new MediaTransformer());
         }
-
     }
 
     public function includeCategories($model)
