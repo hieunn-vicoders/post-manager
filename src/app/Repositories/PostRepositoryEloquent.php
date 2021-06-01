@@ -168,97 +168,78 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $result;
     }
 
-
-
-    public function getRelatedPostsQuery($post_id, $post_type, $number, $order_by, $order, $is_hot, $status) {
-        $query = $this->getEntity()->where('type', $post_type)
+    public function getRelatedPosts($post_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']) {
+        $query = $this->getEntity()
             ->where('id', '<>', $post_id)
+            ->where($where)
             ->orderBy($order_by,$order)
-            ->where('is_hot',$is_hot)
-            ->where('status', $status)
             ->with('languages');
         if($number > 0) {
-            return $query->limit($number)->get();
+            return $query->limit($number)->get($columns);
         }
-        return $query->get();
+        return $query->get($columns);
 
     }
-
-
-    public function getRelatedPostsQueryPaginate($post_id, $post_type, $number, $order_by, $order, $is_hot, $status) {
-        $query = $this->getEntity()->where('type', $post_type)
+    public function getRelatedPostsPaginate($post_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']) {
+        $query = $this->getEntity()
             ->where('id', '<>', $post_id)
+            ->where($where)
             ->orderBy($order_by,$order)
-            ->where('is_hot',$is_hot)
-            ->where('status', $status)
-            ->with('languages')
-            ->paginate($number);
-        return $query;
+            ->with('languages');
+        return $query->paginate($number);
 
     }
-    public function getPostsQuery($post_type, $category_id, $number, $order_by, $order,$is_hot, $status) {
-        $query = $this->getEntity()->where('type', $post_type)
+    public function getPostsWithCategory($category_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']) {
+        $query = $this->getEntity()->where($where)
             ->orderBy($order_by,$order)
-            ->where('is_hot',$is_hot)
-            ->where('status', $status)
             ->with('languages');
-        if ($category_id != '') {
-                $query = $query->whereHas('categories', function ($q) use ($category_id) {
-                    $q->where('categories.id', $category_id); });
-            }
+            $query = $query->whereHas('categories', function ($q) use ($category_id) {
+                $q->where('categories.id', $category_id); });
         if($number > 0) {
-            return $query->limit($number)->get();
+            return $query->limit($number)->get($columns);
         }
-        return $query->get();
+        return $query->get($columns);
     }
-    public function getPostsQueryPaginate($post_type, $category_id, $number, $order_by, $order,$is_hot, $status) {
-        $query = $this->getEntity()->where('type', $post_type)
+    public function getPostsWithCategoryPaginate($category_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']) {
+        $query = $this->getEntity()->select($columns)
+            ->where($where)
             ->orderBy($order_by,$order)
-            ->where('is_hot',$is_hot)
-            ->where('status', $status)
             ->with('languages');
-        if ($category_id != '') {
-                $query = $query->whereHas('categories', function ($q) use ($category_id) {
-                    $q->where('categories.id', $category_id); });
-        }
+            $query = $query->whereHas('categories', function ($q) use ($category_id) {
+                $q->where('categories.id', $category_id); });
         return $query->paginate($number);
     }
-
-    public function getSearchResultQuery($key_word,$number,$post_type,$category_id,$order_by,$order, $is_hot, $status) {
-
-        $query = $this->getEntity()->orderBy($order_by,$order)
-            ->where('is_hot',$is_hot)
-            ->where('status', $status)
+    public function getSearchResult($key_word,array $list_field = ['title'],array $where, $category_id = 0,$number = 10,$order_by = 'order', $order = 'asc', $columns = ['*']) {
+        $query = $this->getEntity()->where(function($q) use($list_field , $key_word) {
+            foreach ($list_field  as $field)
+                $q->orWhere($field, 'like', "%{$key_word}%");
+        });
+        $query->where($where)
+            ->orderBy($order_by,$order)
             ->with('languages');
-            if ($post_type != '') {
-                $query = $query->where('type', $post_type);
-            }
-            if ($category_id != '') {
+            if ($category_id > 0) {
                 $query = $query->whereHas('categories', function ($q) use ($category_id) {
                     $q->where('categories.id', $category_id); });
             }
-            $query->where('title', 'like', "%{$key_word}%")->orWhere('description', "%{$key_word}%");
+
         if($number > 0) {
-            return $query->limit($number)->get();
+            return $query->limit($number)->get($columns);
         }
-        return $query->get();
+        return $query->get($columns);
     }
-    public function getSearchResultQueryPaginate($key_word,$number,$post_type,$category_id,$order_by,$order, $is_hot, $status) {
-
-        $query = $this->getEntity()->orderBy($order_by,$order)
-            ->where('is_hot',$is_hot)
-            ->where('status', $status)
+    public function getSearchResultPaginate($key_word, array $list_field  = ['title'], array $where, $category_id = 0,$number = 10,$order_by = 'order', $order = 'asc', $columns = ['*']) {
+        $query = $this->getEntity()->where(function($q) use($list_field , $key_word) {
+            foreach ($list_field  as $field)
+                $q->orWhere($field, 'like', "%{$key_word}%");
+        });
+        $query->select($columns)->where($where)
+            ->orderBy($order_by,$order)
             ->with('languages');
-            if ($post_type != '') {
-                $query = $query->where('type', $post_type);
-            }
-            if ($category_id != '') {
+            if ($category_id > 0) {
                 $query = $query->whereHas('categories', function ($q) use ($category_id) {
                     $q->where('categories.id', $category_id); });
             }
-        return $query->where('title', 'like', "%{$key_word}%")->orWhere('description', "%{$key_word}%")
-           ->paginate($number);
+        return $query->paginate($number);
 
     }
-
 }
