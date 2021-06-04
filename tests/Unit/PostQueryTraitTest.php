@@ -16,7 +16,7 @@ use VCComponent\Laravel\Vicoders\Core\Exceptions\NotFoundException;
 use VCComponent\Laravel\Post\Repositories\PostRepositoryEloquent;
 // use VCComponent\Laravel\Post\Repositories\PostRepository;
 
-use VCComponent\Laravel\Category\Entities\Category;
+
 class PostQueryTraitTest extends PostQueryTraitTestCase
 {
     use RefreshDatabase;
@@ -28,10 +28,8 @@ class PostQueryTraitTest extends PostQueryTraitTestCase
     {
         $posts  = factory(BasePost::class, 5)->create();
         $abouts = factory(BasePost::class, 10)->create(['type' => 'about']);
-
         $this->assertInstanceOf(Collection::class, Post::getByType());
         $this->assertInstanceOf(Collection::class, Post::getByType('about', 5));
-
         $this->assertCount(5, Post::getByType()->toArray());
         $this->assertCount(10, Post::getByType('about')->toArray());
     }
@@ -39,6 +37,7 @@ class PostQueryTraitTest extends PostQueryTraitTestCase
     /**
      * @test
      */
+
     public function can_get_post_by_type_with_pagination()
     {
         $posts  = factory(BasePost::class, 5)->create();
@@ -161,6 +160,8 @@ class PostQueryTraitTest extends PostQueryTraitTestCase
     /**
      * @test
      */
+
+
     public function can_get_search_result_paginate() {
         $repository = App::make(PostRepository::class);
         $post_about  = factory(BasePost::class)->create(['title'=>'post about']);
