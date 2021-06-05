@@ -5,11 +5,14 @@ namespace VCComponent\Laravel\Post\Test\Unit;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\App;
 use VCComponent\Laravel\Post\Entities\Post as BasePost;
+use VCComponent\Laravel\Post\Repositories\PostRepository;
 use VCComponent\Laravel\Post\Test\Stubs\Models\Post;
 use VCComponent\Laravel\Post\Test\Unit\PostQueryTraitTestCase;
 use VCComponent\Laravel\Vicoders\Core\Exceptions\NotFoundException;
-
+use VCComponent\Laravel\Post\Repositories\PostRepositoryEloquent;
+// use VCComponent\Laravel\Post\Repositories\PostRepository;
 class PostQueryTraitTest extends PostQueryTraitTestCase
 {
     use RefreshDatabase;
@@ -65,8 +68,66 @@ class PostQueryTraitTest extends PostQueryTraitTestCase
         $this->expectExceptionMessage('About not found');
 
         $post = factory(BasePost::class)->create();
-
         Post::findByType($post->id, 'about');
+    }
+
+
+    /**
+     * @test
+     */
+    public function can_find_by_field()
+    {
+        $repository = App::make(PostRepository::class);
+        $post  = factory(BasePost::class)->create();
+        $about = factory(BasePost::class)->create(['type' => 'about']);
+        $this->assertSame($post->id, $repository->findByField('id', $post->id)[0]->id);
+        $this->assertSame($about->id, $repository->findByField('id', $about->id, 'about')[0]->id);
+    }
+    /**
+     * @test
+     */
+    public function can_find_by_where()
+    {
+        $repository = App::make(PostRepository::class);
+        $post  = factory(BasePost::class)->create();
+        $about = factory(BasePost::class)->create(['type' => 'about']);
+        $this->assertSame($post->id, $repository->findByWhere(['id' => $post->id])[0]->id);
+        $this->assertSame($about->id, $repository->findByWhere(['id' => $about->id], 'about')[0]->id);
+    }
+    /**
+     * @test
+     */
+    public function can_get_post_all()
+    {
+        $repository = App::make(PostRepository::class);
+        $post  = factory(BasePost::class)->create();
+        $about = factory(BasePost::class)->create(['type' => 'about']);
+        $this->assertSame($post->id, $repository->getPostsAll()[0]->id);
+        $this->assertSame($about->id, $repository->getPostsAll('about')[0]->id);
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_post_by_id()
+    {
+        $repository = App::make(PostRepository::class);
+        $post  = factory(BasePost::class)->create();
+        $about = factory(BasePost::class)->create(['type' => 'about']);
+        $this->assertSame($post->id, $repository->getPostByID($post->id)->id);
+        $this->assertSame($about->id, $repository->getPostByID($about->id)->id);
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_post_url()
+    {
+        $repository = App::make(PostRepository::class);
+        $post  = factory(BasePost::class)->create();
+        $about = factory(BasePost::class)->create(['type' => 'about']);
+        $this->assertSame('/posts/'.$post->slug, $repository->getPostUrl($post->id));
+        $this->assertSame('/about/'.$about->slug, $repository->getPostUrl($about->id));
     }
 
     /**
@@ -107,4 +168,5 @@ class PostQueryTraitTest extends PostQueryTraitTestCase
         $this->assertSame('test', $post->getMetaField('phone'));
         $this->assertSame('test', $post->getMetaField('address'));
     }
+
 }
