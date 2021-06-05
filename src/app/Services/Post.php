@@ -68,4 +68,6 @@ class Post
         }
         return $this->hotNewsQuery($type, $value);
     }
+
+
 }
