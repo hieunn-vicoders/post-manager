@@ -10,6 +10,10 @@
     - [URL namespace](#url-namespace)
     - [Model and Transformer](#model-and-transformer)
     - [Auth middleware](#auth-middleware)
+  - [Query functions provide](#query-functions-provide)
+    - [List of query functions](#list-of-query-functions)
+    - [Use](#use)
+    - [For example](#for-example)
   - [Post-type](#post-type)
   - [Routes](#routes)
 
@@ -134,7 +138,101 @@ Configure auth middleware in configuration file `config\post.php`
         ],
 ],
 ```
+## Query functions provide
+### List of query functions
+Find  By Field 
+```php
+public function findByField($field, $value = null, $type = 'posts')
+```
+Get posts of post type by array of conditions
+```php
+public function findByWhere(array $where, $type = 'posts')
+```
+Get image list of the article in size
+```php
+public function getPostMedias( $post_id, $image_dimension='')
+```
+Get all posts by post type
+```php
+public function getPostsAll( $type = 'posts') 
+```
+Get posts by id
+```php
+public function getPostByID($post_id)
+```
+Get article link
+```php
+public function getPostUrl($post_id)
+```
+Get list of related articles posts
+```php
+public function getRelatedPosts($post_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']);
 
+public function getRelatedPostsPaginate($post_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']);
+// get a list of related posts with pagination
+```
+Get list of posts of a category
+```php
+public function getPostsWithCategory($category_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']);
+public function getPostsWithCategoryPaginate($category_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']);
+// get list of articles of a pagination category
+```
+Search articles by keyword
+```php
+public function getSearchResult($key_word, array $list_field = ['title'],array $where, $category_id = 0,$number = 10,$order_by = 'order', $order = 'asc', $columns = ['*']);
+public function getSearchResultPaginate($key_word, array $list_field  = ['title'], array $where, $category_id = 0, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']);
+// Search articles by keyword with pagination
+```
+### Use
+At controller use `PostRepository` and add function `__construct`
+```php
+use VCComponent\Laravel\Post\Repositories\PostRepository;
+```
+```php
+public function __construct(PostRepository $postRepo)
+{
+    $this->postRepo = $postRepo;
+}
+```
+### For example
+```php
+$postField = $this->postRepo->findByField('title', 'about');
+// get the post of the post type posts with the title about
+
+$postWhere = $this->postRepo->findByWhere(['status' => 1, 'is_hot' => 1]);
+// get posts belonging to post type posts with field is_hot = 1 and status = 1
+
+$postsType = $this->postRepo->getPostsAll('about');
+// get articles belonging to post type about
+
+$postById = $this->postRepo->getPostByID(1);
+// get posts with id = 1
+$postById = $this->postRepo->getPostMedias(2)
+// get a list of images of posts with id = 2
+$postUrl = $this->postRepo->getPostUrl(1);
+// get the post link with id = 1
+
+$postRelated = $this->postRepo->getRelatedPosts(2, ['type' => 'about'], 0);
+// get all posts related to post with id = 2 and belong to post type about 
+
+$postRelatedPaginate = $this->postRepo->getRelatedPosts(2, ['type' => 'about']);
+// get all posts that are related to post with id = 2 and belong to post type about with pagination
+
+$postWithCategory = $this->postRepo->getPostsWithCategory(2, ['status' => 1]);
+// get all posts in category id = 2 and posts with field status = 1
+
+$postWithCategoryPaginate = $this->postRepo->getPostsWithCategoryPaginate(2, ['status' => 1]);
+// get all posts of category id = 2 and posts with field status = 1 with pagination
+
+$postResult = $this->postRepo->getSearchResult('hi', ['title','content'],['type' => 'posts']);
+// get all posts that contain "hi" in title or content field and belong to post type posts
+
+$postResult = $this->postRepo->getSearchResult('hi', ['title','content'],['status' => 1],3);
+// get all posts that contain "hi" in title or content field and have status = 1 field and belong to category with id = 3
+
+$postResult = $this->postRepo->getSearchResultPaginate('hi', ['title','content'],['status' => 1],3);
+// get all posts that contain "hi" in title or content field and have status = 1 field and belong to category with id = 3 with pagination
+```
 ## Post-type
 
 By default, the package provide `posts` post-type. If you want to define additional `post-type`, feel free to add the `post-type` name to `postTypes()` method in your `Post` model class.
@@ -192,3 +290,5 @@ The api endpoint should have these format:
 | DELETE | /api/{namespace}/{post-type}/{id}              |
 | PUT    | /api/{namespace}/{post-type}/status/bulk       |
 | PUT    | /api/{namespace}/{post-type}/status/{id}       |
+
+
