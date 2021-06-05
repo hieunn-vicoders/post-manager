@@ -1,11 +1,9 @@
 {
     "name": "webpress/post-manager",
-    "authors": [
-        {
-            "name": "sonhaichu",
-            "email": "sonhaichu@gmail.com"
-        }
-    ],
+    "authors": [{
+        "name": "sonhaichu",
+        "email": "sonhaichu@gmail.com"
+    }],
     "autoload": {
         "classmap": ["src/app/"],
         "psr-4": {
@@ -20,17 +18,23 @@
     "require": {
         "webpress/core": "^0.1",
         "webpress/view-model": "^0.0",
+<<<<<<< HEAD
         "webpress/category-manager" : "^0.0",
         "webpress/tag-manager" : "^0.0",
         "cviebrock/eloquent-sluggable": "7.0.1",
         "caseyamcl/toc": "2.3.1"
+=======
+        "webpress/category-manager": "^0.1",
+        "webpress/tag-manager": "^0.0",
+        "cviebrock/eloquent-sluggable": "7.0.1"
+>>>>>>> 6aabf665cf108a87e7084ccf560b58d45b00bd06
     },
     "require-dev": {
         "phpunit/phpunit": "8.5.13",
         "orchestra/testbench": "5.0.0"
     },
-     "prefer-stable": true,
-     "extra": {
+    "prefer-stable": true,
+    "extra": {
         "laravel": {
             "providers": [
                 "VCComponent\\Laravel\\Post\\Providers\\PostComponentProvider",

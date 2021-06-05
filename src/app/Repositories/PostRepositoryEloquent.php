@@ -10,6 +10,8 @@ use Prettus\Repository\Eloquent\BaseRepository;
 use VCComponent\Laravel\Post\Entities\Post;
 use VCComponent\Laravel\Post\Repositories\PostRepository;
 use VCComponent\Laravel\Vicoders\Core\Exceptions\NotFoundException;
+use Exception;
+use Illuminate\Support\Str;
 
 /**
  * Class PostRepositoryEloquent.
@@ -45,6 +47,45 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         $this->pushCriteria(app(RequestCriteria::class));
     }
 
+    /**
+     * Find data by a fields
+     *
+     * @param string $type
+     * @param int $id
+     * @return self
+     */
+    public function findByField($field, $value = null, $type = 'posts')
+    {
+        try {
+            return $this->model->ofType($type)->where($field, '=', $value)->get();
+        } catch (Exception $e) {
+            throw new NotFoundException('post not found');
+        }
+    }
+
+    /**
+     * Find data by multiple fields
+     *
+     * @param string $type
+     * @param int $id
+     * @return self
+     */
+    public function findByWhere(array $where, $type = 'posts') {
+        try {
+            return $this->model->ofType($type)->where($where)->get();
+        } catch (Exception $e) {
+            throw new NotFoundException($e);
+        }
+    }
+
+    public function getPostsAll( $type = 'posts') {
+        try {
+            return $this->model->ofType($type)->get();
+        } catch (Exception $e) {
+            throw new NotFoundException($e);
+        }
+    }
+
     public function getWithPagination($filters, $type)
     {
         $request = App::make(Request::class);
@@ -61,6 +102,25 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
             });
 
         return $items;
+    }
+
+    public function getPostByID($post_id) {
+        return $this->model->where('id', $post_id)->first();
+    }
+    public function getPostMedias( $post_id, $image_dimension='') {
+        $post = $this->model->where('id', $post_id)->first();
+        $images=[];
+        $count = 0;
+        foreach ($post->getMedia() as $item) {
+            $images[$count] = $item->getUrl($image_dimension);
+            $count++;
+        }
+        return $images;
+    }
+
+    public function getPostUrl($post_id){
+        $post = $this->model->where('id', $post_id)->first();
+        return '/'.$post->type.'/'.$post->slug;
     }
 
     public function restore($id)
@@ -107,4 +167,72 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $result;
     }
 
+    public function getRelatedPosts($post_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']) {
+        $query = $this->getEntity()
+            ->where('id', '<>', $post_id)
+            ->where($where)
+            ->orderBy($order_by,$order);
+        if($number > 0) {
+            return $query->limit($number)->get($columns);
+        }
+        return $query->get($columns);
+
+    }
+    public function getRelatedPostsPaginate($post_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']) {
+        $query = $this->getEntity()
+            ->where('id', '<>', $post_id)
+            ->where($where)
+            ->orderBy($order_by,$order);
+        return $query->paginate($number);
+
+    }
+    public function getPostsWithCategory($category_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']) {
+        $query = $this->getEntity()->where($where)
+            ->orderBy($order_by,$order);
+            $query = $query->whereHas('categories', function ($q) use ($category_id) {
+                $q->where('categories.id', $category_id); });
+        if($number > 0) {
+            return $query->limit($number)->get($columns);
+        }
+        return $query->get($columns);
+    }
+    public function getPostsWithCategoryPaginate($category_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']) {
+        $query = $this->getEntity()->select($columns)
+            ->where($where)
+            ->orderBy($order_by,$order);
+            $query = $query->whereHas('categories', function ($q) use ($category_id) {
+                $q->where('categories.id', $category_id); });
+        return $query->paginate($number);
+    }
+    public function getSearchResult($key_word, array $list_field = ['title'],array $where, $category_id = 0,$number = 10,$order_by = 'order', $order = 'asc', $columns = ['*']) {
+        $query = $this->getEntity()->where(function($q) use($list_field , $key_word) {
+            foreach ($list_field  as $field)
+                $q->orWhere($field, 'like', "%{$key_word}%");
+        });
+        $query->where($where)
+            ->orderBy($order_by,$order);
+            if ($category_id > 0) {
+                $query = $query->whereHas('categories', function ($q) use ($category_id) {
+                    $q->where('categories.id', $category_id); });
+            }
+
+        if($number > 0) {
+            return $query->limit($number)->get($columns);
+        }
+        return $query->get($columns);
+    }
+    public function getSearchResultPaginate($key_word, array $list_field  = ['title'], array $where, $category_id = 0, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']) {
+        $query = $this->getEntity()->where(function($q) use($list_field , $key_word) {
+            foreach ($list_field  as $field)
+                $q->orWhere($field, 'like', "%{$key_word}%");
+        });
+        $query->select($columns)->where($where)
+            ->orderBy($order_by,$order);
+            if ($category_id > 0) {
+                $query = $query->whereHas('categories', function ($q) use ($category_id) {
+                    $q->where('categories.id', $category_id); });
+            }
+        return $query->paginate($number);
+
+    }
 }
