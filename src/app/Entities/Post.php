@@ -15,11 +15,11 @@ use VCComponent\Laravel\Post\Contracts\PostSchema;
 use VCComponent\Laravel\Post\Traits\PostManagementTrait;
 use VCComponent\Laravel\Post\Traits\PostQueryTrait;
 use VCComponent\Laravel\Post\Traits\PostSchemaTrait;
-use VCComponent\Laravel\Post\Traits\TableOfContentTrait;
+use VCComponent\Laravel\Post\Traits\TableOfContentsTrait;
 
 class Post extends Model implements Transformable, PostSchema, PostManagement
 {
-    use TransformableTrait, PostSchemaTrait, PostManagementTrait, PostQueryTrait, Sluggable, SluggableScopeHelpers, SoftDeletes, HasCategoriesTrait, TableOfContentTrait;
+    use TransformableTrait, PostSchemaTrait, PostManagementTrait, PostQueryTrait, Sluggable, SluggableScopeHelpers, SoftDeletes, HasCategoriesTrait, TableOfContentsTrait;
 
     const STATUS_PENDING   = 0;
     const STATUS_PUBLISHED = 1;
