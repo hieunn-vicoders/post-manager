@@ -14,6 +14,10 @@
     - [List of query functions](#list-of-query-functions)
     - [Use](#use)
     - [For example](#for-example)
+  - [Table of contents](#table-of-contents)
+    - [List of TOC functions](#list-of-toc-functions)
+    - [Using of TOC](#using-of-toc)
+    - [Example of TOC](#example-of-toc)
   - [Post-type](#post-type)
   - [Routes](#routes)
 
@@ -233,6 +237,53 @@ $postResult = $this->postRepo->getSearchResult('hi', ['title','content'],['statu
 $postResult = $this->postRepo->getSearchResultPaginate('hi', ['title','content'],['status' => 1],3);
 // get all posts that contain "hi" in title or content field and have status = 1 field and belong to category with id = 3 with pagination
 ```
+
+## Table of contents
+The package provides a function for `posts` entity to get table of contents by posts content.
+
+### List of TOC functions
+```php 
+$toc = $this->getTableOfContents(2, 4);
+// get a html source code of the table of contents which has top level header equals to <h2> and has 4 levels depth
+```
+
+### Using of TOC
+At `Post` entity extend BasePost
+```php
+use VCComponent\Laravel\Post\Entities\Post as BasePost;
+// [...]
+class Post extends BasePost
+{
+   // [...]
+}
+```
+Or import TableOfContentsTrait and use it in `Post` entity
+```php
+use VCComponent\Laravel\Post\Traits\TableOfContentsTrait;
+
+class Post
+{
+    use TableOfContentsTrait;
+}
+```
+The package also provide a styled view blade that can be included in post-detail page
+```php
+@include('post-manager::table-of-contents', ['custom_class' => 'default_table_of_contents','top_level' => 1, 'depth' => 6])
+//Variables are not necessary to be provided, all variables has their default value.
+```
+Remember publish the `PostComponentProvider`, and import scss file in the main css to use the default style css.
+```cmd
+php artisan vendor:publish --provider="VCComponent\Laravel\Post\Providers\PostComponentProvider"
+```
+```sass
+@import "./table_of_contents/table_of_contents.scss";
+```
+### Example of TOC
+```php
+@include('post-manager::table-of-contents', ['custom_class' => 'default_table_of_contents','top_level' => 1, 'depth' => 6])
+//get a table of contents with header is h1 and 6 level depth
+```
+
 ## Post-type
 
 By default, the package provide `posts` post-type. If you want to define additional `post-type`, feel free to add the `post-type` name to `postTypes()` method in your `Post` model class.
