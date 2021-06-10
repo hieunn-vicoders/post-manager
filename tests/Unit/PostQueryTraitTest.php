@@ -100,6 +100,17 @@ class PostQueryTraitTest extends PostQueryTraitTestCase
     /**
      * @test
      */
+    public function can_find_by_where_paginate()
+    {
+        $repository = App::make(PostRepository::class);
+        $post  = factory(BasePost::class)->create();
+        $about = factory(BasePost::class)->create(['type' => 'about']);
+        $this->assertSame($post->id, $repository->findByWherePaginate(['id' => $post->id])[0]->id);
+        $this->assertSame($about->id, $repository->findByWherePaginate(['id' => $about->id], 'about')[0]->id);
+    }
+    /**
+     * @test
+     */
     public function can_get_post_all()
     {
         $repository = App::make(PostRepository::class);
@@ -168,12 +179,20 @@ class PostQueryTraitTest extends PostQueryTraitTestCase
         $post_test  = factory(BasePost::class)->create(['title'=>'post test']);
         $this->assertSame($post_test->title, $repository->getSearchResultPaginate('test',['title'],[])[0]->title);
     }
+    /**
+     * @test
+     */
+
     public function can_get_search_result() {
         $repository = App::make(PostRepository::class);
         $post_about  = factory(BasePost::class)->create(['title'=>'post about']);
         $post_test  = factory(BasePost::class)->create(['title'=>'post test']);
         $this->assertSame($post_test->title, $repository->getSearchResult('test',['title'],[])[0]->title);
     }
+    /**
+     * @test
+     */
+
     public function can_get_related_posts_paginate() {
         $repository = App::make(PostRepository::class);
         $post_a  = factory(BasePost::class)->create(['title'=>'a']);
@@ -181,6 +200,10 @@ class PostQueryTraitTest extends PostQueryTraitTestCase
         $post_b  = factory(BasePost::class)->create(['title'=>'b']);
         $this->assertSame($post_b->title, $repository->getRelatedPostsPaginate($post_a->id,['type'=>'posts'])[0]->title);
     }
+    /**
+     * @test
+     */
+
     public function can_get_related_posts() {
         $repository = App::make(PostRepository::class);
         $post_a  = factory(BasePost::class)->create(['title'=>'a']);
@@ -189,6 +212,9 @@ class PostQueryTraitTest extends PostQueryTraitTestCase
 
         $this->assertSame($post_b->title, $repository->getRelatedPosts($post_a->id,['type'=>'posts'])[0]->title);
     }
+    /**
+     * @test
+     */
 
     public function expect_not_found_exception_if_post_does_not_have_meta_field()
     {

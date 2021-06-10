@@ -146,7 +146,10 @@ public function findByField($field, $value = null, $type = 'posts')
 ```
 Get posts of post type by array of conditions
 ```php
-public function findByWhere(array $where, $type = 'posts')
+public function findByWhere(array $where, $type = 'posts', $number = 10, $order_by = 'order', $order = 'asc');
+
+public function findByWherePaginate(array $where, $type = 'posts', $number = 10, $order_by = 'order', $order = 'asc');
+// Get posts of post type by array of conditions with paginate
 ```
 Get image list of the article in size
 ```php
@@ -201,6 +204,9 @@ $postField = $this->postRepo->findByField('title', 'about');
 
 $postWhere = $this->postRepo->findByWhere(['status' => 1, 'is_hot' => 1]);
 // get posts belonging to post type posts with field is_hot = 1 and status = 1
+
+$postWhere = $this->postRepo->findByWhere(['status' => 1, 'is_hot' => 1]);
+// get posts belonging to post type posts with field is_hot = 1 and status = 1 with paginate
 
 $postsType = $this->postRepo->getPostsAll('about');
 // get articles belonging to post type about

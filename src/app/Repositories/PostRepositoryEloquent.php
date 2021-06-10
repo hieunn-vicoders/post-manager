@@ -70,12 +70,24 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
      * @param int $id
      * @return self
      */
-    public function findByWhere(array $where, $type = 'posts') {
+    public function findByWhere(array $where, $type = 'posts', $number = 10, $order_by = 'order', $order = 'asc') {
         try {
-            return $this->model->ofType($type)->where($where)->get();
+            $query = $this->model->ofType($type)
+            ->where($where)
+            ->orderBy($order_by,$order);
+            if ($number > 0) {
+                return $query->limit($number)->get();
+            }
+            return $query->get();
         } catch (Exception $e) {
             throw new NotFoundException($e);
         }
+    }
+    public function findByWherePaginate(array $where, $type = 'posts', $number = 10, $order_by = 'order', $order = 'asc') {
+         return $this->model->ofType($type)
+         ->where($where)
+         ->orderBy($order_by,$order)
+         ->paginate($number);
     }
 
     public function getPostsAll( $type = 'posts') {
