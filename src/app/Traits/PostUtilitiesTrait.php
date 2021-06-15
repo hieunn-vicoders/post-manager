@@ -38,7 +38,7 @@ trait PostUtilitiesTrait
     }
     public function getCreateDate()
     {
-        return $this->thumbnail;
+        return $this->updated_at;
     }
     public function getType()
     {
