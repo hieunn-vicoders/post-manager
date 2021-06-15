@@ -47,7 +47,7 @@ trait PostUtilitiesTrait
 
 
     // get any field by post
-    public function __get($field)
+    public function getFields($field)
     {
         if($this->getAttribute($field))
             return $this->getAttribute($field);
