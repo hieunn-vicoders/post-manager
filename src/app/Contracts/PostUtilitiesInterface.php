@@ -14,6 +14,6 @@ interface PostUtilitiesInterface
     public function getIsHot();
     public function getCreateDate();
     public function getType();
-    public function __get($fields);
+    public function getFields($fields);
 
 }
