@@ -38,7 +38,7 @@ trait PostUtilitiesTrait
     }
     public function getCreateDate()
     {
-        return $this->thumbnail;
+        return $this->updated_at;
     }
     public function getType()
     {
@@ -47,7 +47,7 @@ trait PostUtilitiesTrait
 
 
     // get any field by post
-    public function __get($field)
+    public function getFields($field)
     {
         if($this->getAttribute($field))
             return $this->getAttribute($field);
