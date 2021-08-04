@@ -60,6 +60,6 @@ class PostSchemaRuleController extends ApiController
             $transformer = new $this->transformer;
         }
 
-        return $this->response->paginator($schemarules, $transformer);
+        return $this->response->collection($schemarules, $transformer);
     }
 }

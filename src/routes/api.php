@@ -6,7 +6,7 @@ if (config('post.models.post') !== null) {
     $model_class = VCComponent\Laravel\Post\Entities\Post::class;
 }
 
-$model     = new $model_class;
+$model = new $model_class;
 $postTypes = $model->postTypes();
 
 $api = app('Dingo\Api\Routing\Router');

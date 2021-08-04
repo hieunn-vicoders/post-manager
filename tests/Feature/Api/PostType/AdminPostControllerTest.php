@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Post\Test\Feature\Api\PostType;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use VCComponent\Laravel\Post\Entities\Post;
+use VCComponent\Laravel\Post\Entities\PostMeta;
 use VCComponent\Laravel\Post\Entities\PostSchema;
 use VCComponent\Laravel\Post\Test\TestCase;
 
@@ -32,9 +33,9 @@ class AdminPostControllerTest extends TestCase
     {
         $post = factory(Post::class)->state('about')->create()->toArray();
 
-        $id            = $post['id'];
+        $id = $post['id'];
         $post['title'] = 'update title';
-        $data          = $post;
+        $data = $post;
 
         unset($data['updated_at']);
         unset($data['created_at']);
@@ -86,9 +87,9 @@ class AdminPostControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson([
             'data' => [
-                'title'       => $post->title,
+                'title' => $post->title,
                 'description' => $post->description,
-                'content'     => $post->content,
+                'content' => $post->content,
             ],
         ]);
     }
@@ -118,13 +119,13 @@ class AdminPostControllerTest extends TestCase
 
         $schemas = PostSchema::get()->map(function ($item) {
             return [
-                'id'             => $item->id,
-                'name'           => $item->name,
-                'label'          => $item->label,
+                'id' => $item->id,
+                'name' => $item->name,
+                'label' => $item->label,
                 'schema_type_id' => $item->schema_type_id,
                 'schema_rule_id' => $item->schema_rule_id,
-                'post_type'      => $item->post_type,
-                'timestamps'     => [
+                'post_type' => $item->post_type,
+                'timestamps' => [
                     'created_at' => $item->created_at->toJSON(),
                     'updated_at' => $item->updated_at->toJSON(),
                 ],
@@ -150,7 +151,7 @@ class AdminPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ["ids" => $listIds];
+        $data = ["ids" => $listIds];
 
         $response = $this->call('DELETE', 'api/post-management/admin/about/trash/bulk', $data);
 
@@ -206,7 +207,7 @@ class AdminPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ["ids" => $listIds];
+        $data = ["ids" => $listIds];
 
         $response = $this->call('DELETE', 'api/post-management/admin/about/bulk', $data);
 
@@ -239,7 +240,7 @@ class AdminPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ["ids" => $listIds];
+        $data = ["ids" => $listIds];
 
         $response = $this->call('DELETE', 'api/post-management/admin/about/trash/bulk', $data);
 
@@ -316,7 +317,7 @@ class AdminPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ["ids" => $listIds];
+        $data = ["ids" => $listIds];
 
         $response = $this->call('DELETE', 'api/post-management/admin/about/bulk', $data);
 
@@ -400,7 +401,7 @@ class AdminPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ['ids' => $listIds, 'status' => 5];
+        $data = ['ids' => $listIds, 'status' => 5];
 
         $response = $this->json('GET', 'api/post-management/admin/about/all');
         $response->assertJsonFragment(['status' => 1]);
@@ -425,7 +426,7 @@ class AdminPostControllerTest extends TestCase
 
         $this->assertDatabaseHas('posts', $post);
 
-        $data     = ['status' => 2];
+        $data = ['status' => 2];
         $response = $this->json('PUT', 'api/post-management/admin/about/' . $post['id'] . '/status', $data);
 
         $response->assertStatus(200);
@@ -434,5 +435,139 @@ class AdminPostControllerTest extends TestCase
         $response = $this->json('GET', 'api/post-management/admin/about/' . $post['id']);
 
         $response->assertJson(['data' => $data]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_schema_when_create_post_of_type_about_by_admin()
+    {
+        $schemas = factory(PostSchema::class, 1)->state('about')->create();
+        $post_metas = [];
+        foreach ($schemas as $schema) {
+            $post_metas[$schema->name] = $schema->name . "_value";
+        }
+        $post = factory(Post::class)->state('about')->make($post_metas)->toArray();
+
+        $response = $this->call('POST', 'api/post-management/admin/about', $post);
+
+        $response->assertStatus(200);
+        $response->assertJson(['data' => $post]);
+
+        foreach ($post_metas as $key => $value) {
+            $this->assertDatabaseHas('post_meta', ['key' => $key, 'value' => $value]);
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function can_skip_create_undefined_schema_when_create_post_of_type_about_by_admin()
+    {
+        $post_metas = [
+            'an_undefine_schema_key' => 'its_value',
+        ];
+        $post = factory(Post::class)->state('about')->make($post_metas)->toArray();
+
+        unset($post['an_undefine_schema_key']);
+
+        $response = $this->call('POST', 'api/post-management/admin/about', $post);
+
+        $response->assertStatus(200);
+        $response->assertJson(['data' => $post]);
+
+        foreach ($post_metas as $key => $value) {
+            $this->assertDatabaseMissing('post_meta', ['key' => $key, 'value' => $value]);
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_new_schema_when_update_post_of_type_about_by_admin()
+    {
+        //Fake a new schema in post_schema TABLE
+        $schemas = factory(PostSchema::class, 1)->state('about')->create();
+        $post_metas = [];
+        foreach ($schemas as $schema) {
+            $post_metas[$schema->name] = $schema->name . "_value";
+        }
+
+        //Fake a new post in posts TABLE in order to update
+        $post = factory(Post::class)->state('about')->create()->toArray();
+
+        //Fake upddate data of the post with meta datas
+        $update_post_data = factory(Post::class)->make($post_metas)->toArray();
+
+        $response = $this->call('PUT', 'api/post-management/admin/about/' . $post['id'], $update_post_data);
+
+        //Assert post has been updated
+        $response->assertStatus(200);
+        $response->assertJson(['data' => $update_post_data]);
+
+        //Assert poste metas have been created
+        foreach ($post_metas as $key => $value) {
+            $this->assertDatabaseHas('post_meta', ['key' => $key, 'value' => $value]);
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function can_update_existed_schema_when_update_post_of_type_about_by_admin()
+    {
+        //Fake a new schema in post_schema TABLE
+        $schemas = factory(PostSchema::class, 1)->state('about')->create();
+
+        $post_meta_datas = [];
+        $post_metas = [];
+        foreach ($schemas as $schema) {
+            $post_meta_datas[$schema->name] = $schema->name . "_value";
+            array_push($post_metas, factory(PostMeta::class)->make([
+                'key' => $schema->name,
+                'value' => "",
+            ]));
+        }
+
+        //Fake a new post in posts TABLE in order to update
+        $post = factory(Post::class)->state('about')->create()->postMetas()->saveMany($post_metas);
+
+        //Fake upddate data of the post with meta datas
+        $update_post_data = factory(Post::class)->state('about')->make($post_meta_datas)->toArray();
+
+        $response = $this->call('PUT', 'api/post-management/admin/about/' . $post[0]->id, $update_post_data);
+
+        //Assert post has been updated
+        $response->assertStatus(200);
+        $response->assertJson(['data' => $update_post_data]);
+
+        //Assert poste metas have been updated
+        foreach ($post_meta_datas as $key => $value) {
+            $this->assertDatabaseHas('post_meta', ['key' => $key, 'value' => $value]);
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function can_skip_update_undefined_schema_when_update_post_of_type_about_by_admin()
+    {
+        $post_metas = [
+            'an_undefine_schema_key' => 'its_value',
+        ];
+        $post = factory(Post::class)->state('about')->create()->toArray();
+
+        $new_data_with_undefin_schema = factory(Post::class)->make($post_metas)->toArray();
+
+        unset($new_data_with_undefin_schema['an_undefine_schema_key']);
+
+        $response = $this->call('PUT', 'api/post-management/admin/about/' . $post['id'], $new_data_with_undefin_schema);
+
+        $response->assertStatus(200);
+        $response->assertJson(['data' => $new_data_with_undefin_schema]);
+
+        foreach ($post_metas as $key => $value) {
+            $this->assertDatabaseMissing('post_meta', ['key' => $key, 'value' => $value]);
+        }
     }
 }
