@@ -3,7 +3,6 @@
 namespace VCComponent\Laravel\Post\Traits;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use VCComponent\Laravel\Post\Facades\Schema as PostSchemaFacade;
 
 trait Helpers
@@ -17,7 +16,7 @@ trait Helpers
 
     private function getPostTypeFromRequest(Request $request)
     {
-        $path_items  = collect(explode('/', $request->path()));
+        $path_items = collect(explode('/', $request->path()));
         $check_admin = $path_items->filter(function ($item) {
             return $item === 'admin';
         })->count();
@@ -67,10 +66,10 @@ trait Helpers
         }
 
         $request_data_keys = $request_data->keys();
-        $schema_keys       = PostSchemaFacade::getKey($type)->toArray();
-        $default_keys      = $request_data_keys->diff($schema_keys)->all();
+        $schema_keys = PostSchemaFacade::getKey($type)->toArray();
+        $default_keys = $request_data_keys->diff($schema_keys)->all();
 
-        $data            = [];
+        $data = [];
         $data['default'] = $request_data->filter(function ($value, $key) use ($default_keys) {
             return in_array($key, $default_keys);
         })->toArray();
@@ -88,10 +87,10 @@ trait Helpers
         } else {
             $model_class = \VCComponent\Laravel\Post\Entities\Post::class;
         }
-        $model      = new $model_class;
-        $postTypes  = $model->postTypes();
+        $model = new $model_class;
+        $postTypes = $model->postTypes();
         $path_items = collect(explode('/', $request->path()));
-        $type       = 'posts';
+        $type = 'posts';
 
         foreach ($postTypes as $value) {
             foreach ($path_items as $item) {
@@ -113,7 +112,7 @@ trait Helpers
         } else {
             $model_class = \VCComponent\Laravel\Post\Entities\Draftable::class;
         }
-        $model      = new $model_class;
+        $model = new $model_class;
         $draftTypes = $model->draftTypes();
         $path_items = collect(explode('/', $request->path()));
 

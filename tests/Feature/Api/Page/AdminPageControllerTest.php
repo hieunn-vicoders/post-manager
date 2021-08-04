@@ -25,9 +25,9 @@ class AdminPageControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson(['data' => [
-            'title'       => $data['title'],
+            'title' => $data['title'],
             'description' => $data['description'],
-            'content'     => $data['content'],
+            'content' => $data['content'],
         ],
         ]);
 
@@ -44,9 +44,9 @@ class AdminPageControllerTest extends TestCase
         unset($post['updated_at']);
         unset($post['created_at']);
 
-        $id          = $post->id;
+        $id = $post->id;
         $post->title = 'update title';
-        $data        = $post->toArray();
+        $data = $post->toArray();
 
         $response = $this->json('PUT', 'api/post-management/admin/pages/' . $id, $data);
 
@@ -93,9 +93,9 @@ class AdminPageControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson([
             'data' => [
-                'title'       => $post->title,
+                'title' => $post->title,
                 'description' => $post->description,
-                'content'     => $post->content,
+                'content' => $post->content,
             ],
         ]);
     }
@@ -145,7 +145,7 @@ class AdminPageControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ['ids' => $listIds, 'status' => 5];
+        $data = ['ids' => $listIds, 'status' => 5];
 
         $response = $this->json('GET', 'api/post-management/admin/pages/all');
         $response->assertJsonFragment(['status' => 1]);
@@ -170,7 +170,7 @@ class AdminPageControllerTest extends TestCase
 
         $this->assertDatabaseHas('posts', $post);
 
-        $data     = ['status' => 2];
+        $data = ['status' => 2];
         $response = $this->json('PUT', 'api/post-management/admin/pages/' . $post['id'] . '/status', $data);
 
         $response->assertStatus(200);
@@ -190,16 +190,15 @@ class AdminPageControllerTest extends TestCase
 
         $response = $this->json('GET', 'api/post-management/admin/pages/field-meta');
         $response->assertStatus(200);
-
         $schemas = PostSchema::get()->map(function ($item) {
             return [
-                'id'             => $item->id,
-                'name'           => $item->name,
-                'label'          => $item->label,
+                'id' => $item->id,
+                'name' => $item->name,
+                'label' => $item->label,
                 'schema_type_id' => $item->schema_type_id,
                 'schema_rule_id' => $item->schema_rule_id,
-                'post_type'      => $item->post_type,
-                'timestamps'     => [
+                'post_type' => $item->post_type,
+                'timestamps' => [
                     'created_at' => $item->created_at->toJSON(),
                     'updated_at' => $item->updated_at->toJSON(),
                 ],

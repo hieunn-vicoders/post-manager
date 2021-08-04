@@ -58,12 +58,12 @@ class FrontendPostControllerTest extends TestCase
     public function can_delete_post_by_frontend_router()
     {
         $post = factory(Post::class)->create()->toArray();
-       
+
         unset($post['updated_at']);
         unset($post['created_at']);
 
         $this->assertDatabaseHas('posts', $post);
-       
+
         $response = $this->call('DELETE', 'api/post-management/posts/' . $post['id']);
 
         $response->assertStatus(200);
@@ -112,7 +112,7 @@ class FrontendPostControllerTest extends TestCase
         unset($post['created_at']);
 
         $this->assertDatabaseHas('posts', $post);
-        
+
         $response = $this->call('GET', 'api/post-management/posts/all');
         $response->assertJsonMissingExact([
             'meta' => [
@@ -136,7 +136,7 @@ class FrontendPostControllerTest extends TestCase
             unset($e['created_at']);
             return $e;
         })->toArray();
-        
+
         $listIds = array_column($posts, 'id');
         $data    = ['ids' => $listIds, 'status' => 5];
 

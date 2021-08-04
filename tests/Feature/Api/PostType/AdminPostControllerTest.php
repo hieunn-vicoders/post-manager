@@ -32,9 +32,9 @@ class AdminPostControllerTest extends TestCase
     {
         $post = factory(Post::class)->state('about')->create()->toArray();
 
-        $id            = $post['id'];
+        $id = $post['id'];
         $post['title'] = 'update title';
-        $data          = $post;
+        $data = $post;
 
         unset($data['updated_at']);
         unset($data['created_at']);
@@ -86,9 +86,9 @@ class AdminPostControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson([
             'data' => [
-                'title'       => $post->title,
+                'title' => $post->title,
                 'description' => $post->description,
-                'content'     => $post->content,
+                'content' => $post->content,
             ],
         ]);
     }
@@ -118,13 +118,13 @@ class AdminPostControllerTest extends TestCase
 
         $schemas = PostSchema::get()->map(function ($item) {
             return [
-                'id'             => $item->id,
-                'name'           => $item->name,
-                'label'          => $item->label,
+                'id' => $item->id,
+                'name' => $item->name,
+                'label' => $item->label,
                 'schema_type_id' => $item->schema_type_id,
                 'schema_rule_id' => $item->schema_rule_id,
-                'post_type'      => $item->post_type,
-                'timestamps'     => [
+                'post_type' => $item->post_type,
+                'timestamps' => [
                     'created_at' => $item->created_at->toJSON(),
                     'updated_at' => $item->updated_at->toJSON(),
                 ],
@@ -150,7 +150,7 @@ class AdminPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ["ids" => $listIds];
+        $data = ["ids" => $listIds];
 
         $response = $this->call('DELETE', 'api/post-management/admin/about/trash/bulk', $data);
 
@@ -206,7 +206,7 @@ class AdminPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ["ids" => $listIds];
+        $data = ["ids" => $listIds];
 
         $response = $this->call('DELETE', 'api/post-management/admin/about/bulk', $data);
 
@@ -239,7 +239,7 @@ class AdminPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ["ids" => $listIds];
+        $data = ["ids" => $listIds];
 
         $response = $this->call('DELETE', 'api/post-management/admin/about/trash/bulk', $data);
 
@@ -316,7 +316,7 @@ class AdminPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ["ids" => $listIds];
+        $data = ["ids" => $listIds];
 
         $response = $this->call('DELETE', 'api/post-management/admin/about/bulk', $data);
 
@@ -400,7 +400,7 @@ class AdminPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ['ids' => $listIds, 'status' => 5];
+        $data = ['ids' => $listIds, 'status' => 5];
 
         $response = $this->json('GET', 'api/post-management/admin/about/all');
         $response->assertJsonFragment(['status' => 1]);
@@ -425,7 +425,7 @@ class AdminPostControllerTest extends TestCase
 
         $this->assertDatabaseHas('posts', $post);
 
-        $data     = ['status' => 2];
+        $data = ['status' => 2];
         $response = $this->json('PUT', 'api/post-management/admin/about/' . $post['id'] . '/status', $data);
 
         $response->assertStatus(200);
@@ -435,4 +435,5 @@ class AdminPostControllerTest extends TestCase
 
         $response->assertJson(['data' => $data]);
     }
+
 }

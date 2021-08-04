@@ -13,27 +13,27 @@ trait DraftableAdminMethods
 {
     public function __construct(DraftableRepository $repository, DraftableValidator $validator)
     {
-        $this->repository  = $repository;
-        $this->entity      = $repository->getEntity();
-        $this->validator   = $validator;
+        $this->repository = $repository;
+        $this->entity = $repository->getEntity();
+        $this->validator = $validator;
         $this->transformer = DraftableTransformer::class;
     }
     public function index(Request $request)
     {
         $query = $this->entity;
 
-        $query    = $this->applyConstraintsFromRequest($query, $request);
-        $query    = $this->applySearchFromRequest($query, ['name'], $request);
-        $query    = $this->applyOrderByFromRequest($query, $request);
+        $query = $this->applyConstraintsFromRequest($query, $request);
+        $query = $this->applySearchFromRequest($query, ['name'], $request);
+        $query = $this->applyOrderByFromRequest($query, $request);
         $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
-        $drafts   = $query->paginate($per_page);
+        $drafts = $query->paginate($per_page);
 
         return $this->response->paginator($drafts, new $this->transformer());
     }
     public function store(Request $request)
     {
         $this->validator->isValid($request, 'RULE_CREATE');
-        $data  = $request->all();
+        $data = $request->all();
         $draft = $this->repository->create($data);
 
         event(new PreviewEvent($draft));
@@ -67,7 +67,7 @@ trait DraftableAdminMethods
     public function update(Request $request, $id)
     {
         $this->validator->isValid($request, 'RULE_UPDATE');
-        $data  = $request->all();
+        $data = $request->all();
         $draft = $this->repository->update($data, $id);
 
         return $this->response->item($draft, new $this->transformer());

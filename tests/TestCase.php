@@ -9,6 +9,7 @@ use VCComponent\Laravel\Post\Entities\Post;
 use VCComponent\Laravel\Post\Providers\PostComponentProvider;
 use VCComponent\Laravel\Post\Providers\PostComponentRouteProvider;
 use VCComponent\Laravel\Post\Transformers\PostTransformer;
+
 class TestCase extends OrchestraTestCase
 {
     /**
@@ -20,6 +21,7 @@ class TestCase extends OrchestraTestCase
      */
     protected function getPackageProviders($app)
     {
+
         return [
             PostComponentProvider::class,
             PostComponentRouteProvider::class,
@@ -50,9 +52,9 @@ class TestCase extends OrchestraTestCase
         $app['config']->set('app.key', 'base64:TEQ1o2POo+3dUuWXamjwGSBx/fsso+viCCg9iFaXNUA=');
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
         $app['config']->set('post.namespace', 'post-management');
         $app['config']->set('post.models', [
@@ -62,49 +64,75 @@ class TestCase extends OrchestraTestCase
             'post' => \VCComponent\Laravel\Post\Transformers\PostTransformer::class,
         ]);
         $app['config']->set('post.auth_middleware', [
-            'admin'    => [
-                'middleware' => ''
+            'admin' => [
+                'middleware' => '',
             ],
             'frontend' => [
-                'middleware' => ''
+                'middleware' => '',
             ],
         ]);
         $app['config']->set('api', [
-            'standardsTree'      => 'x',
-            'subtype'            => '',
-            'version'            => 'v1',
-            'prefix'             => 'api',
-            'domain'             => null,
-            'name'               => null,
+            'standardsTree' => 'x',
+            'subtype' => '',
+            'version' => 'v1',
+            'prefix' => 'api',
+            'domain' => null,
+            'name' => null,
             'conditionalRequest' => true,
-            'strict'             => false,
-            'debug'              => true,
-            'errorFormat'        => [
-                'message'     => ':message',
-                'errors'      => ':errors',
-                'code'        => ':code',
+            'strict' => false,
+            'debug' => true,
+            'errorFormat' => [
+                'message' => ':message',
+                'errors' => ':errors',
+                'code' => ':code',
                 'status_code' => ':status_code',
-                'debug'       => ':debug',
+                'debug' => ':debug',
             ],
-            'middleware'         => [
+            'middleware' => [
             ],
-            'auth'               => [
+            'auth' => [
             ],
-            'throttling'         => [
+            'throttling' => [
             ],
-            'transformer'        => \Dingo\Api\Transformer\Adapter\Fractal::class,
-            'defaultFormat'      => 'json',
-            'formats'            => [
+            'transformer' => \Dingo\Api\Transformer\Adapter\Fractal::class,
+            'defaultFormat' => 'json',
+            'formats' => [
                 'json' => \Dingo\Api\Http\Response\Format\Json::class,
             ],
-            'formatsOptions'     => [
+            'formatsOptions' => [
                 'json' => [
                     'pretty_print' => false,
                     'indent_style' => 'space',
-                    'indent_size'  => 2,
+                    'indent_size' => 2,
                 ],
             ],
         ]);
 
+    }
+    public function assertExits($response, $error_message)
+    {
+        $response->assertStatus(400);
+        $response->assertJson([
+            'message' => $error_message,
+        ]);
+    }
+    public function assertValidator($response, $field, $error_message)
+    {
+        $response->assertStatus(422);
+        $response->assertJson([
+            'message' => "The given data was invalid.",
+            "errors" => [
+                $field => [
+                    $error_message,
+                ],
+            ],
+        ]);
+    }
+    public function assertRequired($response, $error_message)
+    {
+        $response->assertStatus(500);
+        $response->assertJsonFragment([
+            'message' => $error_message,
+        ]);
     }
 }
