@@ -56,7 +56,7 @@ trait DraftableAdminMethods
         $query = $this->entity;
 
         $query = $this->applyConstraintsFromRequest($query, $request);
-        $query = $this->applySearchFromRequest($query, ['name'], $request);
+        $query = $this->applySearchFromRequest($query, ['payload'], $request);
         $query = $this->applyOrderByFromRequest($query, $request);
 
         $drafts = $query->get();
