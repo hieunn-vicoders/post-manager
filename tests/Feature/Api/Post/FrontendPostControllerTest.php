@@ -36,9 +36,9 @@ class FrontendPostControllerTest extends TestCase
         unset($post['updated_at']);
         unset($post['created_at']);
 
-        $id          = $post->id;
+        $id = $post->id;
         $post->title = 'update title';
-        $data        = $post->toArray();
+        $data = $post->toArray();
 
         $response = $this->json('PUT', 'api/post-management/posts/' . $id, $data);
 
@@ -83,9 +83,9 @@ class FrontendPostControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson([
             'data' => [
-                'title'       => $post->title,
+                'title' => $post->title,
                 'description' => $post->description,
-                'content'     => $post->content,
+                'content' => $post->content,
             ],
         ]);
     }
@@ -138,7 +138,7 @@ class FrontendPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ['ids' => $listIds, 'status' => 5];
+        $data = ['ids' => $listIds, 'status' => 5];
 
         $response = $this->json('GET', 'api/post-management/posts/all');
         $response->assertJsonFragment(['status' => 1]);
@@ -163,7 +163,7 @@ class FrontendPostControllerTest extends TestCase
 
         $this->assertDatabaseHas('posts', $post);
 
-        $data     = ['status' => 2];
+        $data = ['status' => 2];
         $response = $this->json('PUT', 'api/post-management/posts/' . $post['id'] . '/status', $data);
 
         $response->assertStatus(200);
@@ -334,7 +334,7 @@ class FrontendPostControllerTest extends TestCase
             return $e;
         })->toArray();
 
-        $data    = ['status' => 5];
+        $data = ['status' => 5];
 
         $response = $this->json('PUT', 'api/post-management/posts/status/bulk', $data);
 
@@ -354,7 +354,7 @@ class FrontendPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ['ids' => $listIds];
+        $data = ['ids' => $listIds];
 
         $response = $this->json('PUT', 'api/post-management/posts/status/bulk', $data);
 
@@ -365,7 +365,7 @@ class FrontendPostControllerTest extends TestCase
     /** @test */
     public function should_not_bulk_update_status_undefined_posts_by_frontend_router()
     {
-        $data    = ['ids' => [1, 2, 3, 4, 5], 'status' => "asdsdad"];
+        $data = ['ids' => [1, 2, 3, 4, 5], 'status' => "asdsdad"];
 
         $response = $this->json('PUT', 'api/post-management/posts/status/bulk', $data);
 
@@ -376,7 +376,7 @@ class FrontendPostControllerTest extends TestCase
     /** @test */
     public function should_not_update_status_undefined_posts_by_frontend_router()
     {
-        $data    = ['status' => "asdsdad"];
+        $data = ['status' => "asdsdad"];
 
         $response = $this->json('PUT', 'api/post-management/posts/1/status', $data);
 
@@ -388,7 +388,7 @@ class FrontendPostControllerTest extends TestCase
     public function should_not_update_status_posts_with_null_status_by_frontend_router()
     {
         $post = factory(Post::class)->create();
-        $data    = [];
+        $data = [];
 
         $response = $this->json('PUT', 'api/post-management/posts/' . $post->id . '/status', $data);
 
@@ -409,7 +409,7 @@ class FrontendPostControllerTest extends TestCase
     public function should_not_create_posts_with_null_title_by_frontend_router()
     {
         $post = factory(Post::class)->make([
-            'title' => null
+            'title' => null,
         ])->toArray();
 
         $response = $this->json('POST', 'api/post-management/posts/', $post);
@@ -422,7 +422,7 @@ class FrontendPostControllerTest extends TestCase
     public function should_not_create_posts_with_null_content_by_frontend_router()
     {
         $post = factory(Post::class)->make([
-            'content' => null
+            'content' => null,
         ])->toArray();
 
         $response = $this->json('POST', 'api/post-management/posts/', $post);

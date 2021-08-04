@@ -804,15 +804,15 @@ class AdminPostControllerTest extends TestCase
     public function should_get_list_posts_with_search_admin_router()
     {
         factory(Post::class, 5)->create();
-        $post = factory(Post::class)->create(['title' => 'test'])->toArray();
+        $post = factory(Post::class)->create(['title' => 'test_post'])->toArray();
         unset($post['created_at']);
         unset($post['updated_at']);
-        $response = $this->json('GET', 'api/post-management/admin/posts/list-all?search=test');
+        $response = $this->json('GET', 'api/post-management/admin/posts/list-all?search=test_post');
         $response->assertStatus(200);
         $response->assertJson([
             'data' => [$post],
         ]);
-
+        $response->assertJsonCount(1, 'data');
         $response->assertJsonStructure([
             'data' => [],
             'meta' => [
@@ -1030,11 +1030,12 @@ class AdminPostControllerTest extends TestCase
     public function should_get_all_posts_with_search_admin_router()
     {
         factory(Post::class, 5)->create();
-        $post = factory(Post::class)->create(['title' => 'test'])->toArray();
+        $post = factory(Post::class)->create(['title' => 'test_post'])->toArray();
         unset($post['created_at']);
         unset($post['updated_at']);
-        $response = $this->json('GET', 'api/post-management/admin/posts/all?search=test');
+        $response = $this->json('GET', 'api/post-management/admin/posts/all?search=test_post');
         $response->assertStatus(200);
+        $response->assertJsonCount(1, 'data');
         $response->assertJson([
             'data' => [$post],
         ]);
@@ -1367,11 +1368,12 @@ class AdminPostControllerTest extends TestCase
     public function should_get_all_paginate_posts_with_search_admin_router()
     {
         factory(Post::class, 5)->create();
-        $post = factory(Post::class)->create(['title' => 'test'])->toArray();
+        $post = factory(Post::class)->create(['title' => 'test_post'])->toArray();
         unset($post['created_at']);
         unset($post['updated_at']);
-        $response = $this->json('GET', 'api/post-management/admin/posts?search=test');
+        $response = $this->json('GET', 'api/post-management/admin/posts?search=test_post');
         $response->assertStatus(200);
+        $response->assertJsonCount(1, 'data');
         $response->assertJson([
             'data' => [$post],
         ]);
@@ -1665,11 +1667,12 @@ class AdminPostControllerTest extends TestCase
     public function should_get_all_pages_with_search_admin_router()
     {
         factory(Post::class, 5)->states('pages')->create();
-        $post = factory(Post::class)->states('pages')->create(['title' => 'test'])->toArray();
+        $post = factory(Post::class)->states('pages')->create(['title' => 'test_post'])->toArray();
         unset($post['created_at']);
         unset($post['updated_at']);
-        $response = $this->json('GET', 'api/post-management/admin/pages/all?search=test');
+        $response = $this->json('GET', 'api/post-management/admin/pages/all?search=test_post');
         $response->assertStatus(200);
+        $response->assertJsonCount(1, 'data');
         $response->assertJson([
             'data' => [$post],
         ]);
@@ -1969,14 +1972,15 @@ class AdminPostControllerTest extends TestCase
     public function should_get_all_paginate_pages_with_search_admin_router()
     {
         factory(Post::class, 5)->create();
-        $post = factory(Post::class)->states('pages')->create(['title' => 'test'])->toArray();
-        unset($post['created_at']);
-        unset($post['updated_at']);
-        $response = $this->json('GET', 'api/post-management/admin/pages?search=test');
+        $page = factory(Post::class)->states('pages')->create(['title' => 'test_pages'])->toArray();
+        unset($page['created_at']);
+        unset($page['updated_at']);
+        $response = $this->json('GET', 'api/post-management/admin/pages');
         $response->assertStatus(200);
         $response->assertJson([
-            'data' => [$post],
+            'data' => [$page],
         ]);
+        $response->assertJsonCount(1, 'data');
         $response->assertJsonStructure([
             'data' => [],
             'meta' => [

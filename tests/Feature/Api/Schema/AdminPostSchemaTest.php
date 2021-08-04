@@ -72,23 +72,15 @@ class AdminPostSchemaTest extends TestCase
     /** @test */
     public function can_get_paginate_schemas_with_search_by_admin()
     {
-        $schemas = factory(PostSchema::class, 5)->create();
-
-        $search = $schemas[0]->name;
-
-        $schemas = $schemas->filter(function ($schema) use ($search) {
-            unset($schema['created_at']);
-            unset($schema['updated_at']);
-            return $schema->name == $search;
-        })->toArray();
-
-        $list_ids = array_column($schemas, 'id');
-        array_multisort($list_ids, SORT_DESC, $schemas);
-
+        factory(PostSchema::class, 5)->create();
+        $schema = factory(PostSchema::class)->create(['name' => 'test_schema'])->toArray();
+        unset($schema['created_at']);
+        unset($schema['updated_at']);
+        $search = $schema['name'];
         $response = $this->call('GET', 'api/post-management/admin/post-schemas?search=' . $search);
-
         $response->assertStatus(200);
-        $response->assertJson(['data' => $schemas]);
+        $response->assertJson(['data' => [$schema]]);
+        $response->assertJsonCount(1, 'data');
         $response->assertJsonStructure([
             'meta' => [
                 'pagination' => [
@@ -132,7 +124,7 @@ class AdminPostSchemaTest extends TestCase
     public function can_create_schema_by_admin()
     {
         $data = factory(PostSchema::class)->make([
-            'post_type' => 'post'
+            'post_type' => 'post',
         ])->toArray();
 
         unset($data['created_at']);
@@ -150,7 +142,7 @@ class AdminPostSchemaTest extends TestCase
     public function should_not_create_schema_with_null_label_by_admin()
     {
         $data = factory(PostSchema::class)->make([
-            'label' => null
+            'label' => null,
         ])->toArray();
 
         $response = $this->call('POST', 'api/post-management/admin/post-schemas', $data);
@@ -159,8 +151,8 @@ class AdminPostSchemaTest extends TestCase
         $response->assertJson(['message' => 'The given data was invalid.']);
         $response->assertJsonStructure([
             'errors' => [
-                'label' => []
-            ]
+                'label' => [],
+            ],
         ]);
     }
 
@@ -168,7 +160,7 @@ class AdminPostSchemaTest extends TestCase
     public function should_not_create_schema_with_null_schema_type_id_by_admin()
     {
         $data = factory(PostSchema::class)->make([
-            'schema_type_id' => null
+            'schema_type_id' => null,
         ])->toArray();
 
         $response = $this->call('POST', 'api/post-management/admin/post-schemas', $data);
@@ -177,8 +169,8 @@ class AdminPostSchemaTest extends TestCase
         $response->assertJson(['message' => 'The given data was invalid.']);
         $response->assertJsonStructure([
             'errors' => [
-                'schema_type_id' => []
-            ]
+                'schema_type_id' => [],
+            ],
         ]);
     }
 
@@ -186,7 +178,7 @@ class AdminPostSchemaTest extends TestCase
     public function should_not_create_schema_with_null_schema_rule_id_by_admin()
     {
         $data = factory(PostSchema::class)->make([
-            'schema_rule_id' => null
+            'schema_rule_id' => null,
         ])->toArray();
 
         $response = $this->call('POST', 'api/post-management/admin/post-schemas', $data);
@@ -195,8 +187,8 @@ class AdminPostSchemaTest extends TestCase
         $response->assertJson(['message' => 'The given data was invalid.']);
         $response->assertJsonStructure([
             'errors' => [
-                'schema_rule_id' => []
-            ]
+                'schema_rule_id' => [],
+            ],
         ]);
     }
 
@@ -204,7 +196,7 @@ class AdminPostSchemaTest extends TestCase
     public function should_not_create_schema_with_null_post_type_by_admin()
     {
         $data = factory(PostSchema::class)->make([
-            'post_type' => null
+            'post_type' => null,
         ])->toArray();
 
         $response = $this->call('POST', 'api/post-management/admin/post-schemas', $data);
@@ -213,8 +205,8 @@ class AdminPostSchemaTest extends TestCase
         $response->assertJson(['message' => 'The given data was invalid.']);
         $response->assertJsonStructure([
             'errors' => [
-                'post_type' => []
-            ]
+                'post_type' => [],
+            ],
         ]);
     }
 
@@ -222,7 +214,7 @@ class AdminPostSchemaTest extends TestCase
     public function can_get_a_schema_by_admin()
     {
         $schema = factory(PostSchema::class)->create([
-            'post_type' => 'post'
+            'post_type' => 'post',
         ])->toArray();
 
         unset($schema['created_at']);
@@ -230,7 +222,7 @@ class AdminPostSchemaTest extends TestCase
 
         $response = $this->call('GET', 'api/post-management/admin/post-schemas/' . $schema['id']);
 
-        // $response->assertStatus(200);
+        $response->assertStatus(200);
         $response->assertJson(['data' => $schema]);
     }
 
@@ -301,7 +293,7 @@ class AdminPostSchemaTest extends TestCase
             unset($schema_type['updated_at']);
             return $schema_type;
         })->toArray();
-        
+
         $schema_types = array_merge($schema_types, $this->getDefaultsSchemaType());
 
         $list_ids = array_column($schema_types, 'id');
@@ -350,22 +342,17 @@ class AdminPostSchemaTest extends TestCase
     /** @test */
     public function can_get_list_pagiante_schema_types_with_search_by_admin()
     {
-        $schema_types = factory(PostSchemaType::class, 5)->create();
-
-        $search = $schema_types[0]->name;
-
-        $schema_types = $schema_types->filter(function ($schema_type) use ($search) {
-            unset($schema_type['created_at']);
-            unset($schema_type['updated_at']);
-            return $schema_type->name == $search;
-        })->toArray();
-
-        $list_ids = array_column($schema_types, 'id');
-        array_multisort($list_ids, SORT_DESC, $schema_types);
+        factory(PostSchemaType::class, 5)->create();
+        $schema_type = factory(PostSchemaType::class)->create(['name' => 'schema_type'])->toArray();
+        unset($schema_type['created_at']);
+        unset($schema_type['updated_at']);
+        $search = $schema_type['name'];
 
         $response = $this->call('GET', 'api/post-management/admin/post-schema-types?search=' . $search);
         $response->assertStatus(200);
-        $response->assertJson(['data' => $schema_types]);
+        $response->assertJson(['data' => [$schema_type]]);
+        $response->assertJsonCount(1, 'data');
+
         $response->assertJsonStructure([
             'meta' => [
                 'pagination' => [
@@ -416,7 +403,7 @@ class AdminPostSchemaTest extends TestCase
             unset($schema_type['updated_at']);
             return $schema_type;
         })->toArray();
-        
+
         $schema_types = array_merge($schema_types, $this->getDefaultsSchemaType());
 
         $list_ids = array_column($schema_types, 'id');
@@ -451,22 +438,18 @@ class AdminPostSchemaTest extends TestCase
     /** @test */
     public function can_get_list_all_schema_types_with_search_by_admin()
     {
-        $schema_types = factory(PostSchemaType::class, 5)->create();
+        factory(PostSchemaType::class, 5)->create();
+        $schema_type = factory(PostSchemaType::class)->create(['name' => 'schema_type'])->toArray();
+        unset($schema_type['created_at']);
+        unset($schema_type['updated_at']);
 
-        $search = $schema_types[0]->name;
-
-        $schema_types = $schema_types->filter(function ($schema_type) use ($search) {
-            unset($schema_type['created_at']);
-            unset($schema_type['updated_at']);
-            return $schema_type->name == $search;
-        })->toArray();
-
-        $list_ids = array_column($schema_types, 'id');
-        array_multisort($list_ids, SORT_DESC, $schema_types);
+        $search = $schema_type['name'];
 
         $response = $this->call('GET', 'api/post-management/admin/post-schema-types/all?search=' . $search);
         $response->assertStatus(200);
-        $response->assertJson(['data' => $schema_types]);
+        $response->assertJson(['data' => [$schema_type]]);
+        $response->assertJsonCount(1, 'data');
+
     }
 
     /** @test */
@@ -550,22 +533,16 @@ class AdminPostSchemaTest extends TestCase
     /** @test */
     public function can_get_list_pagiante_schema_rules_with_search_by_admin()
     {
-        $schema_rules = factory(PostSchemaRule::class, 5)->create();
-
-        $search = $schema_rules[0]->name;
-
-        $schema_rules = $schema_rules->filter(function ($schema_rule) use ($search) {
-            unset($schema_rule['created_at']);
-            unset($schema_rule['updated_at']);
-            return $schema_rule->name == $search;
-        })->toArray();
-
-        $list_ids = array_column($schema_rules, 'id');
-        array_multisort($list_ids, SORT_DESC, $schema_rules);
+        factory(PostSchemaRule::class, 5)->create();
+        $schema_rules = factory(PostSchemaRule::class)->create(['name' => 'schema_rules'])->toArray();
+        unset($schema_rules['created_at']);
+        unset($schema_rules['updated_at']);
+        $search = $schema_rules['name'];
 
         $response = $this->call('GET', 'api/post-management/admin/post-schema-rules?search=' . $search);
         $response->assertStatus(200);
-        $response->assertJson(['data' => $schema_rules]);
+        $response->assertJson(['data' => [$schema_rules]]);
+        $response->assertJsonCount(1, 'data');
         $response->assertJsonStructure([
             'meta' => [
                 'pagination' => [
@@ -647,22 +624,17 @@ class AdminPostSchemaTest extends TestCase
     /** @test */
     public function can_get_list_all_schema_rules_with_search_by_admin()
     {
-        $schema_rules = factory(PostSchemaRule::class, 5)->create();
-
-        $search = $schema_rules[0]->name;
-
-        $schema_rules = $schema_rules->filter(function ($schema_rule) use ($search) {
-            unset($schema_rule['created_at']);
-            unset($schema_rule['updated_at']);
-            return $schema_rule->name == $search;
-        })->toArray();
-
-        $list_ids = array_column($schema_rules, 'id');
-        array_multisort($list_ids, SORT_DESC, $schema_rules);
+        factory(PostSchemaRule::class, 5)->create();
+        $schema_rules = factory(PostSchemaRule::class)->create(['name' => 'schema_rules'])->toArray();
+        unset($schema_rules['created_at']);
+        unset($schema_rules['updated_at']);
+        $search = $schema_rules['name'];
 
         $response = $this->call('GET', 'api/post-management/admin/post-schema-rules/all?search=' . $search);
         $response->assertStatus(200);
-        $response->assertJson(['data' => $schema_rules]);
+        $response->assertJson(['data' => [$schema_rules]]);
+        $response->assertJsonCount(1, 'data');
+
     }
 
     /** @test */
@@ -692,23 +664,23 @@ class AdminPostSchemaTest extends TestCase
         return [
             [
                 'id' => 1,
-                'name' => 'text'
+                'name' => 'text',
             ],
             [
                 'id' => 2,
-                'name' => 'textarea'
+                'name' => 'textarea',
             ],
             [
                 'id' => 3,
-                'name' => 'tinyMCE'
+                'name' => 'tinyMCE',
             ],
             [
                 'id' => 4,
-                'name' => 'checkbox'
+                'name' => 'checkbox',
             ],
             [
                 'id' => 5,
-                'name' => 'image'
+                'name' => 'image',
             ],
         ];
     }
