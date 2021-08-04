@@ -55,6 +55,8 @@ class PostComponentProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__ . '/../../config/post.php' => config_path('post.php'),
+            __DIR__ . '/../../resources/sass/table_of_contents' => resource_path('sass/table_of_contents'),
+            __DIR__ . '/../../resources/icon/toc_dropdown.svg'    => public_path('/images/icon/toc_dropdown.svg'),
         ], 'config');
 
         $this->loadViewsFrom(__DIR__ . '/../../resources/views/', 'post-manager');
