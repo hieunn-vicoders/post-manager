@@ -22,9 +22,9 @@ trait PostAdminMethods
     public function __construct(PostRepository $repository, PostValidatorInterface $validator, Request $request)
     {
         $this->repository = $repository;
-        $this->entity     = $repository->getEntity();
-        $this->validator  = $validator;
-        $this->type       = $this->getPostTypeFromRequest($request);
+        $this->entity = $repository->getEntity();
+        $this->validator = $validator;
+        $this->type = $this->getPostTypeFromRequest($request);
 
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $this->middleware(
@@ -82,9 +82,9 @@ trait PostAdminMethods
     {
         if ($request->has('from')) {
 
-            $field     = $this->field($request);
+            $field = $this->field($request);
             $form_date = $this->fomatDate($request->from);
-            $query     = $query->whereDate($field, '>=', $form_date);
+            $query = $query->whereDate($field, '>=', $form_date);
         }
         return $query;
     }
@@ -92,9 +92,9 @@ trait PostAdminMethods
     public function getToDate($request, $query)
     {
         if ($request->has('to')) {
-            $field   = $this->field($request);
+            $field = $this->field($request);
             $to_date = $this->fomatDate($request->to);
-            $query   = $query->whereDate($field, '<=', $to_date);
+            $query = $query->whereDate($field, '<=', $to_date);
         }
         return $query;
     }
@@ -112,7 +112,7 @@ trait PostAdminMethods
         $query = $this->applyOrderByFromRequest($query, $request);
 
         $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
-        $posts    = $query->paginate($per_page);
+        $posts = $query->paginate($per_page);
 
         if ($request->has('includes')) {
             $transformer = new $this->transformer(explode(',', $request->get('includes')));
@@ -159,7 +159,7 @@ trait PostAdminMethods
         $query = $this->applyOrderByFromRequest($query, $request);
 
         $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
-        $posts    = $query->paginate($per_page);
+        $posts = $query->paginate($per_page);
 
         if ($request->has('includes')) {
             $transformer = new $this->transformer(explode(',', $request->get('includes')));
@@ -203,8 +203,8 @@ trait PostAdminMethods
             }
         }
 
-        $data           = $this->filterPostRequestData($request, $this->entity, $this->type);
-        $schema_rules   = $this->validator->getSchemaRules($this->entity, $this->type);
+        $data = $this->filterPostRequestData($request, $this->entity, $this->type);
+        $schema_rules = $this->validator->getSchemaRules($this->entity, $this->type);
         $no_rule_fields = $this->validator->getNoRuleFields($this->entity, $this->type);
 
         $this->validator->isValid($data['default'], 'RULE_ADMIN_CREATE');
@@ -212,14 +212,14 @@ trait PostAdminMethods
 
         $data['default']['author_id'] = $user ? $user->id : null;
 
-        $post       = $this->repository->create($data['default']);
+        $post = $this->repository->create($data['default']);
         $post->type = $this->type;
         $post->save();
 
         if (count($no_rule_fields)) {
             foreach ($no_rule_fields as $key => $value) {
                 $post->postMetas()->updateOrCreate([
-                    'key'   => $key,
+                    'key' => $key,
                     'value' => null,
                 ], ['value' => '']);
             }
@@ -254,7 +254,7 @@ trait PostAdminMethods
             throw new NotFoundException(Str::title($this->type) . ' entity');
         }
 
-        $data         = $this->filterPostRequestData($request, $this->entity, $this->type);
+        $data = $this->filterPostRequestData($request, $this->entity, $this->type);
         $schema_rules = $this->validator->getSchemaRules($this->entity, $this->type);
 
         $this->validator->isValid($data['default'], 'RULE_ADMIN_UPDATE');
@@ -340,7 +340,7 @@ trait PostAdminMethods
 
         $this->validator->isValid($request, 'UPDATE_STATUS_ITEM');
 
-        $data         = $request->all();
+        $data = $request->all();
         $post->status = $data['status'];
         $post->save();
 
@@ -356,7 +356,7 @@ trait PostAdminMethods
             }
         }
         $this->validator->isValid($request, 'RULE_IDS');
-        $ids   = $request->ids;
+        $ids = $request->ids;
         $query = $this->entity;
         $query = $this->applyQueryScope($query, 'type', $this->type);
         $posts = $query->whereIn('id', $ids);
@@ -371,7 +371,7 @@ trait PostAdminMethods
     {
         $query = $this->entity;
         $query = $this->applyQueryScope($query, 'type', $this->type);
-        $post  = $query->where('id', $id)->get();
+        $post = $query->where('id', $id)->get();
         if (count($post) > 0) {
             throw new NotFoundException('Post');
         }
@@ -385,7 +385,7 @@ trait PostAdminMethods
     public function bulkRestore(Request $request)
     {
         $this->validator->isValid($request, 'RULE_IDS');
-        $ids   = $request->ids;
+        $ids = $request->ids;
         $query = $this->entity;
         $posts = $query->onlyTrashed()->whereIn("id", $ids)->get();
 
@@ -419,7 +419,7 @@ trait PostAdminMethods
             throw new NotFoundException("Post");
         }
         $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
-        $post     = $trash->paginate($per_page);
+        $post = $trash->paginate($per_page);
 
         return $this->response->paginator($post, new $this->transformer());
     }
@@ -428,7 +428,6 @@ trait PostAdminMethods
     {
         $query = $this->entity;
         $query = $this->applyQueryScope($query, 'type', $this->type);
-
         $posts = $query->onlyTrashed()->forceDelete();
         return $this->success();
     }
@@ -442,7 +441,7 @@ trait PostAdminMethods
     public function bulkDeleteTrash(Request $request)
     {
         $this->validator->isValid($request, 'RULE_IDS');
-        $ids   = $request->ids;
+        $ids = $request->ids;
         $posts = $this->entity->onlyTrashed()->whereIn("id", $ids)->get();
         if (count($ids) > $posts->count()) {
             throw new NotFoundException("post");
@@ -455,7 +454,6 @@ trait PostAdminMethods
     {
         $query = $this->entity;
         $query = $this->applyQueryScope($query, 'type', $this->type);
-
         $post = $query->where('id', $id)->first();
         if (!$post) {
             throw new NotFoundException('Post');
@@ -484,7 +482,7 @@ trait PostAdminMethods
 
         $data = $request->all();
 
-        $data                 = Carbon::parse($request->published_date)->format('Y-m-d');
+        $data = Carbon::parse($request->published_date)->format('Y-m-d');
         $post->published_date = $data;
         $post->save();
 
