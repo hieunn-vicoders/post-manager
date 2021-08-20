@@ -32,6 +32,9 @@ trait PostAdminMethods
                 ['except' => config('post.auth_middleware.admin.except')]
             );
         }
+        else {
+            throw new Exception("Admin middleware configuration is required");
+        }
 
         if (isset(config('post.transformers')['post'])) {
             $this->transformer = config('post.transformers.post');

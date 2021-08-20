@@ -27,6 +27,9 @@ class PostSchemaController extends ApiController
                 ['except' => config('product.auth_middleware.admin.except')]
             );
         }
+        else {
+            throw new Exception("Admin middleware configuration is required");
+        }
     }
 
     public function index(Request $request )
