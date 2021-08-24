@@ -508,7 +508,7 @@ class FrontendPostControllerTest extends TestCase
     public function can_skip_create_undefined_schema_when_create_post__by_frontend_router()
     {
         $post_metas = [
-            'an_undefine_schema_key' => 'its_value'
+            'an_undefine_schema_key' => 'its_value',
         ];
         $post = factory(Post::class)->make($post_metas)->toArray();
 
@@ -568,7 +568,7 @@ class FrontendPostControllerTest extends TestCase
             $post_meta_datas[$schema->name] = $schema->name . "_value";
             array_push($post_metas, factory(PostMeta::class)->make([
                 'key' => $schema->name,
-                'value' => ""
+                'value' => "",
             ]));
         }
 
@@ -596,7 +596,7 @@ class FrontendPostControllerTest extends TestCase
     public function can_skip_update_undefined_schema_when_update_post_by_frontend_router()
     {
         $post_metas = [
-            'an_undefine_schema_key' => 'its_value'
+            'an_undefine_schema_key' => 'its_value',
         ];
         $post = factory(Post::class)->create()->toArray();
 

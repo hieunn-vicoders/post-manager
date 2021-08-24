@@ -37,9 +37,9 @@ class FrontendPageControllerTest extends TestCase
         unset($post['updated_at']);
         unset($post['created_at']);
 
-        $id          = $post->id;
+        $id = $post->id;
         $post->title = 'update title';
-        $data        = $post->toArray();
+        $data = $post->toArray();
 
         $response = $this->json('PUT', 'api/post-management/pages/' . $id, $data);
 
@@ -85,9 +85,9 @@ class FrontendPageControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson([
             'data' => [
-                'title'       => $post->title,
+                'title' => $post->title,
                 'description' => $post->description,
-                'content'     => $post->content,
+                'content' => $post->content,
             ],
         ]);
     }
@@ -104,7 +104,7 @@ class FrontendPageControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
-     /**
+    /**
      * @test
      */
     public function can_get_post_list_with_no_paginate_by_frontend_router()
@@ -126,7 +126,7 @@ class FrontendPageControllerTest extends TestCase
         $response->assertJson(['data' => [$post]]);
     }
 
-     /**
+    /**
      * @test
      */
     public function can_bulk_update_status_pages_by_frontend_router()
@@ -140,7 +140,7 @@ class FrontendPageControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ['ids' => $listIds, 'status' => 5];
+        $data = ['ids' => $listIds, 'status' => 5];
 
         $response = $this->json('GET', 'api/post-management/pages/all');
         $response->assertJsonFragment(['status' => 1]);
@@ -154,7 +154,7 @@ class FrontendPageControllerTest extends TestCase
         $response->assertJsonFragment(['status' => 5]);
     }
 
-     /**
+    /**
      * @test
      */
     public function can_update_status_a_page_by_frontend_router()
@@ -165,7 +165,7 @@ class FrontendPageControllerTest extends TestCase
 
         $this->assertDatabaseHas('posts', $post);
 
-        $data     = ['status' => 2];
+        $data = ['status' => 2];
         $response = $this->json('PUT', 'api/post-management/pages/' . $post['id'] . '/status', $data);
 
         $response->assertStatus(200);
@@ -336,7 +336,7 @@ class FrontendPageControllerTest extends TestCase
             return $e;
         })->toArray();
 
-        $data    = ['status' => 5];
+        $data = ['status' => 5];
 
         $response = $this->json('PUT', 'api/post-management/pages/status/bulk', $data);
 
@@ -356,7 +356,7 @@ class FrontendPageControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ['ids' => $listIds];
+        $data = ['ids' => $listIds];
 
         $response = $this->json('PUT', 'api/post-management/pages/status/bulk', $data);
 
@@ -367,7 +367,7 @@ class FrontendPageControllerTest extends TestCase
     /** @test */
     public function should_not_bulk_update_status_undefined_posts_by_frontend_router()
     {
-        $data    = ['ids' => [1, 2, 3, 4, 5], 'status' => "asdsdad"];
+        $data = ['ids' => [1, 2, 3, 4, 5], 'status' => "asdsdad"];
 
         $response = $this->json('PUT', 'api/post-management/pages/status/bulk', $data);
 
@@ -378,7 +378,7 @@ class FrontendPageControllerTest extends TestCase
     /** @test */
     public function should_not_update_status_undefined_posts_by_frontend_router()
     {
-        $data    = ['status' => "asdsdad"];
+        $data = ['status' => "asdsdad"];
 
         $response = $this->json('PUT', 'api/post-management/pages/1/status', $data);
 
@@ -390,7 +390,7 @@ class FrontendPageControllerTest extends TestCase
     public function should_not_update_status_posts_with_null_status_by_frontend_router()
     {
         $post = factory(Post::class)->state('pages')->create();
-        $data    = [];
+        $data = [];
 
         $response = $this->json('PUT', 'api/post-management/pages/' . $post->id . '/status', $data);
 
@@ -411,7 +411,7 @@ class FrontendPageControllerTest extends TestCase
     public function should_not_create_posts_with_null_title_by_frontend_router()
     {
         $post = factory(Post::class)->state('pages')->make([
-            'title' => null
+            'title' => null,
         ])->toArray();
 
         $response = $this->json('POST', 'api/post-management/pages/', $post);
@@ -424,7 +424,7 @@ class FrontendPageControllerTest extends TestCase
     public function should_not_create_posts_with_null_content_by_frontend_router()
     {
         $post = factory(Post::class)->state('pages')->make([
-            'content' => null
+            'content' => null,
         ])->toArray();
 
         $response = $this->json('POST', 'api/post-management/pages/', $post);
@@ -507,7 +507,7 @@ class FrontendPageControllerTest extends TestCase
     public function can_skip_create_undefined_schema_when_create_post_of_type_pages_by_frontend_router()
     {
         $post_metas = [
-            'an_undefine_schema_key' => 'its_value'
+            'an_undefine_schema_key' => 'its_value',
         ];
         $post = factory(Post::class)->state('pages')->make($post_metas)->toArray();
 
@@ -567,7 +567,7 @@ class FrontendPageControllerTest extends TestCase
             $post_meta_datas[$schema->name] = $schema->name . "_value";
             array_push($post_metas, factory(PostMeta::class)->make([
                 'key' => $schema->name,
-                'value' => ""
+                'value' => "",
             ]));
         }
 
@@ -595,7 +595,7 @@ class FrontendPageControllerTest extends TestCase
     public function can_skip_update_undefined_schema_when_update_post_of_type_pages_by_frontend_router()
     {
         $post_metas = [
-            'an_undefine_schema_key' => 'its_value'
+            'an_undefine_schema_key' => 'its_value',
         ];
         $post = factory(Post::class)->state('pages')->create()->toArray();
 

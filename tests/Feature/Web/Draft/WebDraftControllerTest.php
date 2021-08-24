@@ -16,7 +16,7 @@ class WebDraftControllerTest extends TestCase
      */
     public function can_get_show_draft_by_web_router()
     {
-        $data  = factory(Draftable::class)->make(['draftable_id' => 1]);
+        $data = factory(Draftable::class)->make(['draftable_id' => 1]);
         $draft = $data->toArray();
         $data->save();
 
@@ -26,8 +26,8 @@ class WebDraftControllerTest extends TestCase
         $response->assertViewIs("post-manager::draft");
         $response->assertViewHasAll([
             'draft.draftable_type' => $draft['draftable_type'],
-            'draft.draftable_id'   => $draft['draftable_id'],
-            'draft.payload'        => $draft['payload'],
+            'draft.draftable_id' => $draft['draftable_id'],
+            'draft.payload' => $draft['payload'],
         ]);
     }
 
@@ -36,7 +36,7 @@ class WebDraftControllerTest extends TestCase
      */
     public function can_get_show_draft_type_by_web_router()
     {
-        $data  = factory(Draftable::class)->make(['draftable_id' => 1, 'draftable_type' => 'products']);
+        $data = factory(Draftable::class)->make(['draftable_id' => 1, 'draftable_type' => 'products']);
         $draft = $data->toArray();
         $data->save();
 
@@ -46,8 +46,8 @@ class WebDraftControllerTest extends TestCase
         $response->assertViewIs("post-manager::draft");
         $response->assertViewHasAll([
             'draft.draftable_type' => $draft['draftable_type'],
-            'draft.draftable_id'   => $draft['draftable_id'],
-            'draft.payload'        => $draft['payload'],
+            'draft.draftable_id' => $draft['draftable_id'],
+            'draft.payload' => $draft['payload'],
         ]);
     }
 }
