@@ -31,8 +31,7 @@ trait PostAdminMethods
                 config('post.auth_middleware.admin.middleware'),
                 ['except' => config('post.auth_middleware.admin.except')]
             );
-        }
-        else {
+        } else {
             throw new Exception("Admin middleware configuration is required");
         }
 
@@ -258,6 +257,7 @@ trait PostAdminMethods
         }
 
         $data = $this->filterPostRequestData($request, $this->entity, $this->type);
+
         $schema_rules = $this->validator->getSchemaRules($this->entity, $this->type);
 
         $this->validator->isValid($data['default'], 'RULE_ADMIN_UPDATE');
