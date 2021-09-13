@@ -5,6 +5,7 @@ namespace VCComponent\Laravel\Post\Traits;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use VCComponent\Laravel\Post\Entities\PostSchema;
 use VCComponent\Laravel\Post\Events\PostCreatedByAdminEvent;
@@ -172,16 +173,16 @@ trait PostAdminMethods
 
     public function show(Request $request, $id)
     {
-        if (config('post.auth_middleware.admin.middleware') !== '') {
-            $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToShow($user, $id)) {
-                throw new PermissionDeniedException();
-            }
-        }
-
         $post = $this->repository->findWhere(['id' => $id])->first();
         if (!$post) {
             throw new NotFoundException(($this->type) . ' entity');
+        }
+
+        if (config('post.auth_middleware.admin.middleware') !== '') {
+            $user = $this->getAuthenticatedUser();
+            if (Gate::forUser($user)->denies('view-post', $post)) {
+                throw new PermissionDeniedException();
+            }
         }
 
         if ($request->has('includes')) {
@@ -198,7 +199,7 @@ trait PostAdminMethods
         $user = null;
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToCreate($user)) {
+            if (Gate::forUser($user)->denies('create-post')) {
                 throw new PermissionDeniedException();
             }
         }
@@ -242,16 +243,16 @@ trait PostAdminMethods
 
     public function update(Request $request, $id)
     {
-        if (config('post.auth_middleware.admin.middleware') !== '') {
-            $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToUpdateItem($user, $id)) {
-                throw new PermissionDeniedException();
-            }
-        }
-
         $post = $this->repository->findWhere(['id' => $id])->first();
         if (!$post) {
             throw new NotFoundException(Str::title($this->type) . ' entity');
+        }
+
+        if (config('post.auth_middleware.admin.middleware') !== '') {
+            $user = $this->getAuthenticatedUser();
+            if (Gate::forUser($user)->denies('update-item-post', $post)) {
+                throw new PermissionDeniedException();
+            }
         }
 
         $data = $this->filterPostRequestData($request, $this->entity, $this->type);
@@ -283,16 +284,16 @@ trait PostAdminMethods
 
     public function destroy(Request $request, $id)
     {
-        if (config('post.auth_middleware.admin.middleware') !== '') {
-            $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToDelete($user, $id)) {
-                throw new PermissionDeniedException();
-            }
-        }
-
         $post = $this->repository->findWhere(['id' => $id])->first();
         if (!$post) {
             throw new NotFoundException(Str::title($this->type));
+        }
+
+        if (config('post.auth_middleware.admin.middleware') !== '') {
+            $user = $this->getAuthenticatedUser();
+            if (Gate::forUser($user)->denies('delete-post', $post)) {
+                throw new PermissionDeniedException();
+            }
         }
 
         $this->repository->delete($id);
@@ -312,7 +313,7 @@ trait PostAdminMethods
     {
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToUpdate($user)) {
+            if (Gate::forUser($user)->denies('update-post')) {
                 throw new PermissionDeniedException();
             }
         }
@@ -326,16 +327,16 @@ trait PostAdminMethods
 
     public function updateStatusItem(Request $request, $id)
     {
-        if (config('post.auth_middleware.admin.middleware') !== '') {
-            $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToUpdateItem($user, $id)) {
-                throw new PermissionDeniedException();
-            }
-        }
-
         $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
         if (!$post) {
             throw new NotFoundException(($this->type) . ' entity');
+        }
+
+        if (config('post.auth_middleware.admin.middleware') !== '') {
+            $user = $this->getAuthenticatedUser();
+            if (Gate::forUser($user)->denies('update-item-post')) {
+                throw new PermissionDeniedException();
+            }
         }
 
         $this->validator->isValid($request, 'UPDATE_STATUS_ITEM');
@@ -351,7 +352,7 @@ trait PostAdminMethods
     {
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToUpdate($user)) {
+            if (Gate::forUser($user)->denies('update-user')) {
                 throw new PermissionDeniedException();
             }
         }
@@ -466,16 +467,16 @@ trait PostAdminMethods
 
     public function changeDate(Request $request, $id)
     {
-        if (config('post.auth_middleware.admin.middleware') !== '') {
-            $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToUpdateItem($user, $id)) {
-                throw new PermissionDeniedException();
-            }
-        }
-
         $post = $this->repository->findWhere(['id' => $id, 'type' => $this->type])->first();
         if (!$post) {
             throw new NotFoundException(Str::title($this->type) . ' entity');
+        }
+
+        if (config('post.auth_middleware.admin.middleware') !== '') {
+            $user = $this->getAuthenticatedUser();
+            if (Gate::forUser($user)->denies('update-item-post', $post)) {
+                throw new PermissionDeniedException();
+            }
         }
 
         $this->validator->isValid($request, 'RULE_ADMIN_UPDATE_DATE');

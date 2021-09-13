@@ -3,6 +3,7 @@
 namespace VCComponent\Laravel\Post\Traits;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use VCComponent\Laravel\Post\Events\PostCreatedEvent;
 use VCComponent\Laravel\Post\Events\PostDeletedEvent;
 use VCComponent\Laravel\Post\Events\PostUpdatedEvent;
@@ -56,7 +57,8 @@ trait PostFrontendMethods
         return $this->response->paginator($posts, $transformer);
     }
 
-    function list(Request $request) {
+    function list(Request $request)
+    {
         $query = $this->entity;
 
         $query = $this->applyQueryScope($query, 'type', $this->type);
@@ -77,16 +79,16 @@ trait PostFrontendMethods
 
     public function show(Request $request, $id)
     {
-        if (config('post.auth_middleware.frontend.middleware') !== '') {
-            $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToShow($user, $id)) {
-                throw new PermissionDeniedException();
-            }
-        }
-
         $post = $this->repository->findWhere(['id' => $id])->first();
         if (!$post) {
             throw new NotFoundException($this->type);
+        }
+
+        if (config('post.auth_middleware.frontend.middleware') !== '') {
+            $user = $this->getAuthenticatedUser();
+            if (Gate::forUser($user)->denies('view-post', $post)) {
+                throw new PermissionDeniedException();
+            }
         }
 
         if ($request->has('includes')) {
@@ -102,7 +104,7 @@ trait PostFrontendMethods
     {
         if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToCreate($user)) {
+            if (Gate::forUser($user)->denies('create-post')) {
                 throw new PermissionDeniedException();
             }
         }
@@ -112,7 +114,7 @@ trait PostFrontendMethods
         $no_rule_fields = $this->validator->getNoRuleFields($this->entity, $this->type);
 
         $this->validator->isValid($data['default'], 'RULE_ADMIN_CREATE');
-        if (array_key_exists('schema' ,$data) && $schema_rules) {
+        if (array_key_exists('schema', $data) && $schema_rules) {
             $this->validator->isSchemaValid($data['schema'], $schema_rules);
         }
 
@@ -145,16 +147,16 @@ trait PostFrontendMethods
 
     public function update(Request $request, $id)
     {
-        if (config('post.auth_middleware.frontend.middleware') !== '') {
-            $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToUpdateItem($user, $id)) {
-                throw new PermissionDeniedException();
-            }
-        }
-
         $post = $this->repository->findWhere(['id' => $id])->first();
         if (!$post) {
             throw new NotFoundException(($this->type) . ' entity');
+        }
+
+        if (config('post.auth_middleware.frontend.middleware') !== '') {
+            $user = $this->getAuthenticatedUser();
+            if (Gate::forUser($user)->denies('update-item-post', $post)) {
+                throw new PermissionDeniedException();
+            }
         }
 
         $data         = $this->filterPostRequestData($request, $this->entity, $this->type);
@@ -162,7 +164,7 @@ trait PostFrontendMethods
 
         $this->validator->isValid($data['default'], 'RULE_ADMIN_UPDATE');
 
-        if (array_key_exists('schema' ,$data) && $schema_rules) {
+        if (array_key_exists('schema', $data) && $schema_rules) {
             $this->validator->isSchemaValid($data['schema'], $schema_rules);
         }
 
@@ -186,16 +188,16 @@ trait PostFrontendMethods
 
     public function destroy(Request $request, $id)
     {
-        if (config('post.auth_middleware.frontend.middleware') !== '') {
-            $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToDelete($user, $id)) {
-                throw new PermissionDeniedException();
-            }
-        }
-
         $post = $this->repository->findWhere(['id' => $id])->first();
         if (!$post) {
             throw new NotFoundException(($this->type) . ' entity');
+        }
+
+        if (config('post.auth_middleware.frontend.middleware') !== '') {
+            $user = $this->getAuthenticatedUser();
+            if (Gate::forUser($user)->denies('delete-post', $post)) {
+                throw new PermissionDeniedException();
+            }
         }
 
         $this->repository->delete($id);
@@ -209,7 +211,7 @@ trait PostFrontendMethods
     {
         if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToUpdate($user)) {
+            if (Gate::forUser($user)->denies('update-post')) {
                 throw new PermissionDeniedException();
             }
         }
@@ -243,7 +245,7 @@ trait PostFrontendMethods
 
         if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (!$this->entity->ableToUpdateItem($user, $id)) {
+            if (Gate::forUser($user)->denies('update-item-post', $post)) {
                 throw new PermissionDeniedException();
             }
         }

@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use VCComponent\Laravel\Post\Commands\SchemaCommand;
 use VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface;
 use VCComponent\Laravel\Post\Contracts\PostControllerInterface;
+use VCComponent\Laravel\Post\Contracts\PostPolicyInterface;
 use VCComponent\Laravel\Post\Contracts\ViewDraftDetailControllerInterface;
 use VCComponent\Laravel\Post\Contracts\ViewPostDetailControllerInterface;
 use VCComponent\Laravel\Post\Contracts\ViewPostListControllerInterface;
@@ -16,6 +17,7 @@ use VCComponent\Laravel\Post\Http\Controllers\Api\Frontend\PostController;
 use VCComponent\Laravel\Post\Http\Controllers\Web\DraftDetailController as ViewDraftDetailController;
 use VCComponent\Laravel\Post\Http\Controllers\Web\PostDetailController as ViewPostDetailController;
 use VCComponent\Laravel\Post\Http\Controllers\Web\PostListController as ViewPostListController;
+use VCComponent\Laravel\Post\Policies\PostPolicy;
 use VCComponent\Laravel\Post\Repositories\DraftableRepository;
 use VCComponent\Laravel\Post\Repositories\DraftableRepositoryEloquent;
 use VCComponent\Laravel\Post\Repositories\PostRepository;
@@ -85,8 +87,10 @@ class PostComponentProvider extends ServiceProvider
 
         $this->registerViewModels();
         $this->registerControllers();
+        $this->registerPolicies();
 
         $this->app->bind('vcc.post.schema', SchemaService::class);
+        $this->app->register(PostAuthServiceProvider::class);
     }
 
     private function registerViewModels()
@@ -102,5 +106,10 @@ class PostComponentProvider extends ServiceProvider
         $this->app->bind(AdminPostControllerInterface::class, AdminPostController::class);
         $this->app->bind(PostControllerInterface::class, PostController::class);
         $this->app->bind(ViewDraftDetailControllerInterface::class, ViewDraftDetailController::class);
+    }
+
+    private function registerPolicies()
+    {
+        $this->app->bind(PostPolicyInterface::class, PostPolicy::class);
     }
 }
