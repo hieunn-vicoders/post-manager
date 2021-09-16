@@ -86,7 +86,7 @@ trait PostFrontendMethods
 
         if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('view-post', $post)) {
+            if (Gate::forUser($user)->denies('view', $post)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -104,7 +104,7 @@ trait PostFrontendMethods
     {
         if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('create-post')) {
+            if (Gate::forUser($user)->denies('create', $this->entity)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -154,7 +154,7 @@ trait PostFrontendMethods
 
         if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('update-item-post', $post)) {
+            if (Gate::forUser($user)->denies('update-item', $post)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -195,7 +195,7 @@ trait PostFrontendMethods
 
         if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('delete-post', $post)) {
+            if (Gate::forUser($user)->denies('delete', $post)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -211,7 +211,7 @@ trait PostFrontendMethods
     {
         if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('update-post')) {
+            if (Gate::forUser($user)->denies('update', $this->entity)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -245,7 +245,7 @@ trait PostFrontendMethods
 
         if (config('post.auth_middleware.frontend.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('update-item-post', $post)) {
+            if (Gate::forUser($user)->denies('update-item', $post)) {
                 throw new PermissionDeniedException();
             }
         }

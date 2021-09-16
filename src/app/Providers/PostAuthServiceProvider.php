@@ -4,6 +4,8 @@ namespace VCComponent\Laravel\Post\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use VCComponent\Laravel\Post\Contracts\PostPolicyInterface;
+use VCComponent\Laravel\Post\Entities\Post;
 
 class PostAuthServiceProvider extends ServiceProvider
 {
@@ -13,7 +15,7 @@ class PostAuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        //
+        Post::class => PostPolicyInterface::class,
     ];
 
     /**
@@ -24,12 +26,6 @@ class PostAuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-        
-        Gate::define('view-post', 'VCComponent\Laravel\Post\Contracts\PostPolicyInterface@ableToShow');
-        Gate::define('create-post', 'VCComponent\Laravel\Post\Contracts\PostPolicyInterface@ableToCreate');
-        Gate::define('update-post', 'VCComponent\Laravel\Post\Contracts\PostPolicyInterface@ableToUpdate');
-        Gate::define('update-item-post', 'VCComponent\Laravel\Post\Contracts\PostPolicyInterface@ableToUpdateItem');
-        Gate::define('delete-post', 'VCComponent\Laravel\Post\Contracts\PostPolicyInterface@ableToDelete');
         //
     }
 }

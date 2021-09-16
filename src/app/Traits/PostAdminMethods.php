@@ -180,7 +180,7 @@ trait PostAdminMethods
 
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('view-post', $post)) {
+            if (Gate::forUser($user)->denies('view', $post)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -199,7 +199,7 @@ trait PostAdminMethods
         $user = null;
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('create-post')) {
+            if (Gate::forUser($user)->denies('create', $this->entity)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -250,7 +250,7 @@ trait PostAdminMethods
 
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('update-item-post', $post)) {
+            if (Gate::forUser($user)->denies('update-item', $post)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -291,7 +291,7 @@ trait PostAdminMethods
 
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('delete-post', $post)) {
+            if (Gate::forUser($user)->denies('delete', $post)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -313,7 +313,7 @@ trait PostAdminMethods
     {
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('update-post')) {
+            if (Gate::forUser($user)->denies('update', $this->entity)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -334,7 +334,7 @@ trait PostAdminMethods
 
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('update-item-post')) {
+            if (Gate::forUser($user)->denies('update-item', $post)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -352,7 +352,7 @@ trait PostAdminMethods
     {
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('update-user')) {
+            if (Gate::forUser($user)->denies('update', $this->entity)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -474,7 +474,7 @@ trait PostAdminMethods
 
         if (config('post.auth_middleware.admin.middleware') !== '') {
             $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('update-item-post', $post)) {
+            if (Gate::forUser($user)->denies('update-item', $post)) {
                 throw new PermissionDeniedException();
             }
         }

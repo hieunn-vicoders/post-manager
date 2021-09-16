@@ -6,28 +6,28 @@ use VCComponent\Laravel\Post\Contracts\PostPolicyInterface;
 
 class PostPolicy implements PostPolicyInterface
 {
-    public function ableToShow($user, $model)
+    public function view($user, $model)
     {
-        return true;
+        return $user->hasPermission('view-post');
     }
 
-    public function ableToCreate($user)
+    public function create($user)
     {
-        return true;
+        return $user->hasPermission('create-post');
     }
 
-    public function ableToUpdateItem($user, $model)
+    public function updateItem($user, $model)
     {
-        return true;
+        return $user->hasPermission('update-item-post');
     }
 
-    public function ableToUpdate($user)
+    public function update($user)
     {
-        return true;
+        return $user->hasPermission('update-post');
     }
 
-    public function ableToDelete($user, $model)
+    public function delete($user, $model)
     {
-        return true;
+        return $user->hasPermission('delete-post');
     }
 }
