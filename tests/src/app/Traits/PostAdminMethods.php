@@ -31,8 +31,6 @@ trait PostAdminMethods
                 config('post.auth_middleware.admin.middleware'),
                 ['except' => config('post.auth_middleware.admin.except')]
             );
-        } else {
-            throw new Exception("Admin middleware configuration is required");
         }
 
         if (isset(config('post.transformers')['post'])) {
@@ -103,6 +101,7 @@ trait PostAdminMethods
 
     public function index(Request $request)
     {
+
         $query = $this->entity;
         $query = $this->getFromDate($request, $query);
         $query = $this->getToDate($request, $query);
@@ -115,7 +114,6 @@ trait PostAdminMethods
 
         $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
         $posts = $query->paginate($per_page);
-
         if ($request->has('includes')) {
             $transformer = new $this->transformer(explode(',', $request->get('includes')));
         } else {
@@ -257,7 +255,6 @@ trait PostAdminMethods
         }
 
         $data = $this->filterPostRequestData($request, $this->entity, $this->type);
-
         $schema_rules = $this->validator->getSchemaRules($this->entity, $this->type);
 
         $this->validator->isValid($data['default'], 'RULE_ADMIN_UPDATE');

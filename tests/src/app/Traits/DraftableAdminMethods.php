@@ -13,15 +13,6 @@ trait DraftableAdminMethods
 {
     public function __construct(DraftableRepository $repository, DraftableValidator $validator)
     {
-        if (config('post.auth_middleware.admin.middleware') !== '') {
-            $this->middleware(
-                config('post.auth_middleware.admin.middleware'),
-                ['except' => config('post.auth_middleware.admin.except')]
-            );
-        }
-        else {
-            throw new Exception("Admin middleware configuration is required");
-        }
         $this->repository = $repository;
         $this->entity = $repository->getEntity();
         $this->validator = $validator;

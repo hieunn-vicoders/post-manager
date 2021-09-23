@@ -29,8 +29,6 @@ class PostSchemaTransformer extends TransformerAbstract
             'schema_type_id' => $model->schema_type_id,
             'schema_rule_id' => $model->schema_rule_id,
             'post_type'      => $model->post_type,
-            'post_id'        => $model->post_id,
-            "value"          => $model->value,
             'timestamps'     => [
                 'created_at' => $model->created_at,
                 'updated_at' => $model->updated_at,

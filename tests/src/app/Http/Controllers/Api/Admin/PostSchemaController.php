@@ -2,16 +2,13 @@
 
 namespace VCComponent\Laravel\Post\Http\Controllers\Api\Admin;
 
-use Exception;
 use Illuminate\Http\Request;
 use VCComponent\Laravel\Post\Repositories\PostSchemaRepository;
 use VCComponent\Laravel\Post\Transformers\PostSchemaTransformer;
 use VCComponent\Laravel\Post\Validators\PostSchemaValidator;
+
 use VCComponent\Laravel\Vicoders\Core\Controllers\ApiController;
 use VCComponent\Laravel\Post\Entities\PostMeta;
-use VCComponent\Laravel\Post\Entities\PostSchemaType;
-use VCComponent\Laravel\Post\Entities\PostSchemaRule;
-use VCComponent\Laravel\Post\Entities\Post;
 
 class PostSchemaController extends ApiController
 {
@@ -31,12 +28,9 @@ class PostSchemaController extends ApiController
                 ['except' => config('product.auth_middleware.admin.except')]
             );
         }
-        else {
-            throw new Exception("Admin middleware configuration is required");
-        }
     }
 
-    public function index(Request $request )
+    public function index(Request $request)
     {
         $query = $this->entity;
 
@@ -71,58 +65,12 @@ class PostSchemaController extends ApiController
 
     public function store(Request $request)
     {
-        $post_schema   = config('post-schema');
-        $post_schema = collect($post_schema)->map(function ($post) {
-            $post_type = $post['posttype'];
-            $has_value_items   = collect($post['items'])->map(function ($item)  use ($post_type) {
-                if($item['slug'] != null) {
-                    $post = Post::where('slug', $item['slug'])->first();
+        $this->validator->isValid($request, 'RULE_ADMIN_CREATE');
 
-                    if($post) {
-                        $post_id = $post->id;
-                    }
-                    else {
-                        throw new Exception("slug '".$item['slug']."' không tồn tại");
-                    }
-                }
-                else {
-                    throw new Exception("slug không được bỏ trống");
-                }
-                $has_value_inputs   = collect($item['inputs'])->map(function ($input) use ($post_id, $post_type) {
-                    $label = $input['label'];
-                    $key = $input['key'];
-                    $value = $input['value'] ? $input['value'] : "";
-                    if ($input['type'] != null) {
-                        $type = PostSchemaType::where('name', $input['type'])->first();
-                        $type_id = $type->id;
-                    } else {
-                        $type_id = 1;
-                    }
-                    if ($input['rule'] != null) {
-                        $rule = PostSchemaRule::where('name', $input['rule'])->first();
-                        $rule_id = $rule->id;
-                    } else {
-                        $rule_id = 5;
-                    }
-                    $data = [
-                        "name"           => $key,
-                        "label"          => $label,
-                        'schema_type_id' => $type_id,
-                        'schema_rule_id' => $rule_id,
-                        'post_type'      => $post_type,
-                        'post_id'        => $post_id,
-                        'value'          => $value
-                    ];
-                    $schema = $this->repository->updateOrCreate(["name" => $key], $data);
+        $data = $request->all();
+        $schema = $this->repository->create($data);
 
-                    return $this->response->item($schema, new $this->transformer);
-                    PostMeta::create(["post_id" => $post_id, "key" => $key]);
-                });
-                return $has_value_inputs;
-            });
-            return $has_value_items;
-        });
-        return $post_schema;
+        return $this->response->item($schema, new $this->transformer);
     }
 
     public function update(Request $request, $id)
