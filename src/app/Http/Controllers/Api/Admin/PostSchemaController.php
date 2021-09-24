@@ -9,6 +9,7 @@ use VCComponent\Laravel\Post\Validators\PostSchemaValidator;
 
 use VCComponent\Laravel\Vicoders\Core\Controllers\ApiController;
 use VCComponent\Laravel\Post\Entities\PostMeta;
+
 class PostSchemaController extends ApiController
 {
     protected $repository;
@@ -29,7 +30,7 @@ class PostSchemaController extends ApiController
         }
     }
 
-    public function index(Request $request )
+    public function index(Request $request)
     {
         $query = $this->entity;
 

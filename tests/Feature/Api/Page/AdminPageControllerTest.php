@@ -17,13 +17,14 @@ class AdminPageControllerTest extends TestCase
      */
     public function can_create_page_by_admin_router()
     {
+        $token = $this->loginToken();
+
         $data = factory(Post::class)->state('pages')->create()->toArray();
 
         unset($data['updated_at']);
         unset($data['created_at']);
 
-        $response = $this->json('POST', 'api/post-management/admin/pages', $data);
-
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('POST', 'api/post-management/admin/pages', $data);
         $response->assertStatus(200);
         $response->assertJson(['data' => [
             'title' => $data['title'],
@@ -40,6 +41,8 @@ class AdminPageControllerTest extends TestCase
      */
     public function can_update_post_by_admin_router()
     {
+        $token = $this->loginToken();
+
         $post = factory(Post::class)->state('pages')->create();
 
         unset($post['updated_at']);
@@ -49,7 +52,7 @@ class AdminPageControllerTest extends TestCase
         $post->title = 'update title';
         $data = $post->toArray();
 
-        $response = $this->json('PUT', 'api/post-management/admin/pages/' . $id, $data);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('PUT', 'api/post-management/admin/pages/' . $id, $data);
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -66,6 +69,8 @@ class AdminPageControllerTest extends TestCase
      */
     public function can_delete_post_by_admin_router()
     {
+        $token = $this->loginToken();
+
         $post = factory(Post::class)->state('pages')->create();
 
         $post = $post->toArray();
@@ -75,7 +80,7 @@ class AdminPageControllerTest extends TestCase
 
         $this->assertDatabaseHas('posts', $post);
 
-        $response = $this->call('DELETE', 'api/post-management/admin/pages/' . $post['id']);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('DELETE', 'api/post-management/admin/pages/' . $post['id']);
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
@@ -88,9 +93,11 @@ class AdminPageControllerTest extends TestCase
      */
     public function can_get_post_item_by_admin_router()
     {
+        $token = $this->loginToken();
+
         $post = factory(Post::class)->state('pages')->create();
 
-        $response = $this->call('GET', 'api/post-management/admin/pages/' . $post->id);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('GET', 'api/post-management/admin/pages/' . $post->id);
         $response->assertStatus(200);
         $response->assertJson([
             'data' => [
@@ -137,6 +144,8 @@ class AdminPageControllerTest extends TestCase
      */
     public function can_bulk_update_status_pages_by_admin()
     {
+        $token = $this->loginToken();
+
         $posts = factory(Post::class, 5)->state('pages')->create();
 
         $posts = $posts->map(function ($e) {
@@ -148,15 +157,15 @@ class AdminPageControllerTest extends TestCase
         $listIds = array_column($posts, 'id');
         $data = ['ids' => $listIds, 'status' => 5];
 
-        $response = $this->json('GET', 'api/post-management/admin/pages/all');
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('GET', 'api/post-management/admin/pages/all');
         $response->assertJsonFragment(['status' => 1]);
 
-        $response = $this->json('PUT', 'api/post-management/admin/pages/status/bulk', $data);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('PUT', 'api/post-management/admin/pages/status/bulk', $data);
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
 
-        $response = $this->json('GET', 'api/post-management/admin/pages/all');
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('GET', 'api/post-management/admin/pages/all');
         $response->assertJsonFragment(['status' => 5]);
     }
 
@@ -165,6 +174,8 @@ class AdminPageControllerTest extends TestCase
      */
     public function can_update_status_a_page_by_admin()
     {
+        $token = $this->loginToken();
+
         $post = factory(Post::class)->state('pages')->create()->toArray();
         unset($post['updated_at']);
         unset($post['created_at']);
@@ -172,12 +183,12 @@ class AdminPageControllerTest extends TestCase
         $this->assertDatabaseHas('posts', $post);
 
         $data = ['status' => 2];
-        $response = $this->json('PUT', 'api/post-management/admin/pages/' . $post['id'] . '/status', $data);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('PUT', 'api/post-management/admin/pages/' . $post['id'] . '/status', $data);
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
 
-        $response = $this->json('GET', 'api/post-management/admin/pages/' . $post['id']);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('GET', 'api/post-management/admin/pages/' . $post['id']);
 
         $response->assertJson(['data' => $data]);
     }
@@ -216,6 +227,8 @@ class AdminPageControllerTest extends TestCase
      */
     public function can_create_schema_when_create_post_of_type_pages_by_admin()
     {
+        $token = $this->loginToken();
+
         $schemas = factory(PostSchema::class, 1)->state('pages')->create();
         $post_metas = [];
         foreach ($schemas as $schema) {
@@ -223,7 +236,7 @@ class AdminPageControllerTest extends TestCase
         }
         $post = factory(Post::class)->state('pages')->make($post_metas)->toArray();
 
-        $response = $this->call('POST', 'api/post-management/admin/pages', $post);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('POST', 'api/post-management/admin/pages', $post);
 
         $response->assertStatus(200);
         $response->assertJson(['data' => $post]);
@@ -238,14 +251,16 @@ class AdminPageControllerTest extends TestCase
      */
     public function can_skip_create_undefined_schema_when_create_post_of_type_pages_by_admin()
     {
+        $token = $this->loginToken();
+
         $post_metas = [
-            'an_undefine_schema_key' => 'its_value'
+            'an_undefine_schema_key' => 'its_value',
         ];
         $post = factory(Post::class)->state('pages')->make($post_metas)->toArray();
 
         unset($post['an_undefine_schema_key']);
 
-        $response = $this->call('POST', 'api/post-management/admin/pages', $post);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('POST', 'api/post-management/admin/pages', $post);
 
         $response->assertStatus(200);
         $response->assertJson(['data' => $post]);
@@ -260,6 +275,8 @@ class AdminPageControllerTest extends TestCase
      */
     public function can_create_new_schema_when_update_post_of_type_pages_by_admin()
     {
+        $token = $this->loginToken();
+
         //Fake a new schema in post_schema TABLE
         $schemas = factory(PostSchema::class, 1)->state('pages')->create();
         $post_metas = [];
@@ -273,7 +290,7 @@ class AdminPageControllerTest extends TestCase
         //Fake upddate data of the post with meta datas
         $update_post_data = factory(Post::class)->make($post_metas)->toArray();
 
-        $response = $this->call('PUT', 'api/post-management/admin/pages/' . $post['id'], $update_post_data);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('PUT', 'api/post-management/admin/pages/' . $post['id'], $update_post_data);
 
         //Assert post has been updated
         $response->assertStatus(200);
@@ -290,6 +307,8 @@ class AdminPageControllerTest extends TestCase
      */
     public function can_update_existed_schema_when_update_post_of_type_pages_by_admin()
     {
+        $token = $this->loginToken();
+
         //Fake a new schema in post_schema TABLE
         $schemas = factory(PostSchema::class, 1)->state('pages')->create();
 
@@ -299,7 +318,7 @@ class AdminPageControllerTest extends TestCase
             $post_meta_datas[$schema->name] = $schema->name . "_value";
             array_push($post_metas, factory(PostMeta::class)->make([
                 'key' => $schema->name,
-                'value' => ""
+                'value' => "",
             ]));
         }
 
@@ -309,7 +328,7 @@ class AdminPageControllerTest extends TestCase
         //Fake upddate data of the post with meta datas
         $update_post_data = factory(Post::class)->state('pages')->make($post_meta_datas)->toArray();
 
-        $response = $this->call('PUT', 'api/post-management/admin/pages/' . $post[0]->id, $update_post_data);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('PUT', 'api/post-management/admin/pages/' . $post[0]->id, $update_post_data);
 
         //Assert post has been updated
         $response->assertStatus(200);
@@ -326,8 +345,10 @@ class AdminPageControllerTest extends TestCase
      */
     public function can_skip_update_undefined_schema_when_update_post_of_type_pages_by_admin()
     {
+        $token = $this->loginToken();
+
         $post_metas = [
-            'an_undefine_schema_key' => 'its_value'
+            'an_undefine_schema_key' => 'its_value',
         ];
         $post = factory(Post::class)->state('pages')->create()->toArray();
 
@@ -335,7 +356,7 @@ class AdminPageControllerTest extends TestCase
 
         unset($new_data_with_undefin_schema['an_undefine_schema_key']);
 
-        $response = $this->call('PUT', 'api/post-management/admin/pages/' . $post['id'], $new_data_with_undefin_schema);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('PUT', 'api/post-management/admin/pages/' . $post['id'], $new_data_with_undefin_schema);
 
         $response->assertStatus(200);
         $response->assertJson(['data' => $new_data_with_undefin_schema]);
@@ -344,4 +365,5 @@ class AdminPageControllerTest extends TestCase
             $this->assertDatabaseMissing('post_meta', ['key' => $key, 'value' => $value]);
         }
     }
+
 }

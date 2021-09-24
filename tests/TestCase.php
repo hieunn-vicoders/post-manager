@@ -9,6 +9,10 @@ use VCComponent\Laravel\Post\Entities\Post;
 use VCComponent\Laravel\Post\Providers\PostComponentProvider;
 use VCComponent\Laravel\Post\Providers\PostComponentRouteProvider;
 use VCComponent\Laravel\Post\Transformers\PostTransformer;
+use VCComponent\Laravel\User\Entities\User;
+use VCComponent\Laravel\User\Providers\UserComponentEventProvider;
+use VCComponent\Laravel\User\Providers\UserComponentProvider;
+use VCComponent\Laravel\User\Providers\UserComponentRouteProvider;
 
 class TestCase extends OrchestraTestCase
 {
@@ -27,6 +31,11 @@ class TestCase extends OrchestraTestCase
             PostComponentRouteProvider::class,
             LaravelServiceProvider::class,
             ServiceProvider::class,
+            \Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+            \Illuminate\Auth\AuthServiceProvider::class,
+            UserComponentEventProvider::class,
+            UserComponentProvider::class,
+            UserComponentRouteProvider::class,
         ];
     }
 
@@ -38,6 +47,8 @@ class TestCase extends OrchestraTestCase
         parent::setUp();
 
         $this->withFactories(__DIR__ . '/../src/database/factories');
+        $this->withFactories(__DIR__ . '/../tests/Stubs/Factory');
+
     }
 
     /**
@@ -65,7 +76,10 @@ class TestCase extends OrchestraTestCase
         ]);
         $app['config']->set('post.auth_middleware', [
             'admin' => [
-                'middleware' => '',
+                [
+                    'middleware' => '',
+                    'except' => [],
+                ],
             ],
             'frontend' => [
                 'middleware' => '',
@@ -107,6 +121,10 @@ class TestCase extends OrchestraTestCase
                 ],
             ],
         ]);
+        $app['config']->set('jwt.secret', '5jMwJkcDTUKlzcxEpdBRIbNIeJt1q5kmKWxa0QA2vlUEG6DRlxcgD7uErg51kbBl');
+        $app['config']->set('auth.providers.users.model', \VCComponent\Laravel\User\Entities\User::class);
+        $app['config']->set('user', ['namespace' => 'user-management']);
+        $app['config']->set('repository.cache.enabled', false);
 
     }
     public function assertExits($response, $error_message)
@@ -134,5 +152,16 @@ class TestCase extends OrchestraTestCase
         $response->assertJsonFragment([
             'message' => $error_message,
         ]);
+    }
+    protected function loginToken()
+    {
+        $dataLogin = ['username' => 'admin', 'password' => '123456789', 'email' => 'admin@test.com'];
+        $user = factory(User::class)->make($dataLogin);
+        $user->save();
+        $login = $this->json('POST', 'api/user-management/login', $dataLogin);
+
+        $token = $login->Json()['token'];
+        return $token;
+
     }
 }
