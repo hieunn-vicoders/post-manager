@@ -14,7 +14,7 @@ class AddGutenburgColumnToPostsTable extends Migration
     public function up()
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->json('blocks')->after('is_hot');
+            $table->json('blocks')->after('is_hot')->nullable();
             $table->tinyInteger('editor_type')->after('is_hot')->default(1);
         });
     }
