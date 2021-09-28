@@ -96,6 +96,8 @@ class AdminPostControllerTest extends TestCase
                 'title' => $post->title,
                 'description' => $post->description,
                 'content' => $post->content,
+                'blocks' => $post->blocks,
+                'editor_type' => $post->editor_type
             ],
         ]);
     }
