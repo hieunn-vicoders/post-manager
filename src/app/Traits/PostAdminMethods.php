@@ -102,6 +102,7 @@ trait PostAdminMethods
 
     public function index(Request $request)
     {
+
         $query = $this->entity;
         $query = $this->getFromDate($request, $query);
         $query = $this->getToDate($request, $query);
@@ -114,7 +115,6 @@ trait PostAdminMethods
 
         $per_page = $request->has('per_page') ? (int) $request->get('per_page') : 15;
         $posts = $query->paginate($per_page);
-
         if ($request->has('includes')) {
             $transformer = new $this->transformer(explode(',', $request->get('includes')));
         } else {

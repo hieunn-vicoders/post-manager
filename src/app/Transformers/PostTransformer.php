@@ -41,6 +41,8 @@ class PostTransformer extends TransformerAbstract
             'order'          => (int) $model->order,
             'status'         => (int) $model->status,
             'published_date' => $model->published_date,
+            'blocks'         => json_decode($model->blocks),
+            'editor_type'    => (int) $model->editor_type,
         ];
 
         if ($model->postMetas->count()) {

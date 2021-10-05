@@ -21,7 +21,9 @@
         "webpress/category-manager" : "^3.1",
         "webpress/tag-manager" : "^3.1",
         "cviebrock/eloquent-sluggable": "7.0.1",
-        "caseyamcl/toc": "2.3.1"
+        "caseyamcl/toc": "2.3.1",
+        "webpress/user-manager": "^3.0"
+
     },
     "require-dev": {
         "phpunit/phpunit": "8.5.13",
