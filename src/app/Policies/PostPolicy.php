@@ -6,6 +6,13 @@ use VCComponent\Laravel\Post\Contracts\PostPolicyInterface;
 
 class PostPolicy implements PostPolicyInterface
 {
+    public function before($user, $ability)
+    {
+        if ($user->isAdministrator()) {
+            return true;
+        }
+    }
+
     public function view($user, $model)
     {
         return $user->hasPermission('view-post');
