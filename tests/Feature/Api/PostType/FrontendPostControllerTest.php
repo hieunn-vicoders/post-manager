@@ -37,10 +37,10 @@ class FrontendPostControllerTest extends TestCase
 
         unset($post['updated_at']);
         unset($post['created_at']);
-        
-        $id          = $post->id;
+
+        $id = $post->id;
         $post->title = 'update title';
-        $data        = $post->toArray();
+        $data = $post->toArray();
 
         $response = $this->json('PUT', 'api/post-management/about/' . $id, $data);
 
@@ -86,9 +86,9 @@ class FrontendPostControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson([
             'data' => [
-                'title'       => $post->title,
+                'title' => $post->title,
                 'description' => $post->description,
-                'content'     => $post->content,
+                'content' => $post->content,
             ],
         ]);
     }
@@ -115,7 +115,7 @@ class FrontendPostControllerTest extends TestCase
         unset($post['created_at']);
 
         $this->assertDatabaseHas('posts', $post);
-        
+
         $response = $this->call('GET', 'api/post-management/about/all');
         $response->assertJsonMissingExact([
             'meta' => [
@@ -127,7 +127,7 @@ class FrontendPostControllerTest extends TestCase
         $response->assertJson(['data' => [$post]]);
     }
 
-     /**
+    /**
      * @test
      */
     public function can_bulk_update_status_post_type_by_frontend_router()
@@ -141,7 +141,7 @@ class FrontendPostControllerTest extends TestCase
         })->toArray();
 
         $listIds = array_column($posts, 'id');
-        $data    = ['ids' => $listIds, 'status' => 5];
+        $data = ['ids' => $listIds, 'status' => 5];
 
         $response = $this->json('GET', 'api/post-management/about/all');
         $response->assertJsonFragment(['status' => 1]);
@@ -155,7 +155,7 @@ class FrontendPostControllerTest extends TestCase
         $response->assertJsonFragment(['status' => 5]);
     }
 
-     /**
+    /**
      * @test
      */
     public function can_update_status_a_page_by_frontend_router()
@@ -166,7 +166,7 @@ class FrontendPostControllerTest extends TestCase
 
         $this->assertDatabaseHas('posts', $post);
 
-        $data     = ['status' => 2];
+        $data = ['status' => 2];
         $response = $this->json('PUT', 'api/post-management/about/' . $post['id'] . '/status', $data);
 
         $response->assertStatus(200);
@@ -205,7 +205,7 @@ class FrontendPostControllerTest extends TestCase
     public function can_skip_create_undefined_schema_when_create_post_of_type_about_by_frontend_router()
     {
         $post_metas = [
-            'an_undefine_schema_key' => 'its_value'
+            'an_undefine_schema_key' => 'its_value',
         ];
         $post = factory(Post::class)->state('about')->make($post_metas)->toArray();
 
@@ -265,7 +265,7 @@ class FrontendPostControllerTest extends TestCase
             $post_meta_datas[$schema->name] = $schema->name . "_value";
             array_push($post_metas, factory(PostMeta::class)->make([
                 'key' => $schema->name,
-                'value' => ""
+                'value' => "",
             ]));
         }
 
@@ -293,7 +293,7 @@ class FrontendPostControllerTest extends TestCase
     public function can_skip_update_undefined_schema_when_update_post_of_type_about_by_frontend_router()
     {
         $post_metas = [
-            'an_undefine_schema_key' => 'its_value'
+            'an_undefine_schema_key' => 'its_value',
         ];
         $post = factory(Post::class)->state('about')->create()->toArray();
 

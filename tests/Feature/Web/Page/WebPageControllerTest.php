@@ -106,9 +106,9 @@ class WebPageControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs("post-manager::post-detail");
         $response->assertViewHasAll([
-            'post.title'       => $post['title'],
-            'post.slug'        => $post['slug'],
-            'post.description' => $post['description']
+            'post.title' => $post['title'],
+            'post.slug' => $post['slug'],
+            'post.description' => $post['description'],
         ]);
     }
 

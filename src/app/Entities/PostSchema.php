@@ -11,7 +11,7 @@ class PostSchema extends Model
         'label',
         'schema_type_id',
         'schema_rule_id',
-        'post_type',
+        'post_type'
     ];
 
     public function schemaType()
