@@ -77,4 +77,108 @@ trait PostQueryTrait
             throw new NotFoundException($key . ' field');
         }
     }
+
+    /**
+     * Scope a query to only include hot posts.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeIsHot($query)
+    {
+        return $query->where('is_hot', 1);
+    }
+
+    /**
+     * Scope a query to only include publisded posts.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeIsPublished($query)
+    {
+        return $query->where('status', 1);
+    }
+
+    /**
+     * Scope a query to sort posts by order column.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param string $order
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSortByOrder($query, $order = 'desc')
+    {
+        return $query->orderBy('order', $order);
+    }
+
+    /**
+     * Scope a query to sort posts by published_date column.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param string $order
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSortByPublishedDate($query, $order = 'desc')
+    {
+        return $query->orderBy('published_date', $order);
+    }
+
+    /**
+     * Scope a query to include posts of given category.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param string $slug
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfCategoryBySlug($query, $slug)
+    {
+        return $query->whereHas('categories', function ($q) use ($slug) {
+            $q->where('slug', $slug)->where('status', 1);
+        });
+    }
+
+    /**
+     * Scope a query to include posts of given categories.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param array $slugs
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfCategoriesBySlug($query, $slugs)
+    {
+        return $query->whereHas('categories', function ($q) use ($slugs) {
+            $q->whereIn('slug', $slugs)->where('status', 1);
+        });
+    }
+
+    /**
+     * Scope a query to search posts of given key word. This function is also able to scope with categories, or tags.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param string $search
+     * @param boolean $with_category
+     * @param boolean $with_tag
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfSearching($query, $search, $with_category = false, $with_tag = false)
+    {
+        $query = $query->where(function($q) use($search) {
+            $q->orWhere('title', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->orWhere('content', 'like', "%{$search}%");
+        });
+
+        if ($with_category) {
+            $query->whereHas('categories', function ($q) use ($search) {
+                $q->whereIn('name', 'like', "%{$search}%")->where('status', 1);
+            });
+        }
+
+        if ($with_tag) {
+            $query->whereHas('tags', function ($q) use ($search) {
+                $q->whereIn('name', 'like', "%{$search}%")->where('status', 1);
+            });
+        }
+
+        return $query;
+    }
 }

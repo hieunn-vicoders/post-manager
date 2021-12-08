@@ -11,9 +11,14 @@
     - [Model and Transformer](#model-and-transformer)
     - [Auth middleware](#auth-middleware)
   - [Query functions provide](#query-functions-provide)
-    - [List of query functions](#list-of-query-functions)
-    - [Use](#use)
-    - [For example](#for-example)
+    - [Repository](#repository)
+        - [List of query functions](#list-of-query-functions)
+        - [Use](#use)
+        - [For example](#for-example)
+    - [Entity](#entity)
+        - [List of query functions - Entity](#list-of-query-functions-entity)
+        - [Use - Entity](#use-entity)
+        - [For example - Entity](#for-example-entity)
   - [Table of contents](#table-of-contents)
     - [List of TOC functions](#list-of-toc-functions)
     - [Using of TOC](#using-of-toc)
@@ -143,7 +148,8 @@ Configure auth middleware in configuration file `config\post.php`
 ],
 ```
 ## Query functions provide
-### List of query functions
+### Repository
+#### List of query functions
 Find  By Field 
 ```php
 public function findByField($field, $value = null, $type = 'posts')
@@ -190,7 +196,7 @@ public function getSearchResult($key_word, array $list_field = ['title'],array $
 public function getSearchResultPaginate($key_word, array $list_field  = ['title'], array $where, $category_id = 0, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']);
 // Search articles by keyword with pagination
 ```
-### Use
+#### Use
 At controller use `PostRepository` and add function `__construct`
 ```php
 use VCComponent\Laravel\Post\Repositories\PostRepository;
@@ -201,7 +207,7 @@ public function __construct(PostRepository $postRepo)
     $this->postRepo = $postRepo;
 }
 ```
-### For example
+#### For example
 ```php
 $postField = $this->postRepo->findByField('title', 'about');
 // get the post of the post type posts with the title about
@@ -242,6 +248,99 @@ $postResult = $this->postRepo->getSearchResult('hi', ['title','content'],['statu
 
 $postResult = $this->postRepo->getSearchResultPaginate('hi', ['title','content'],['status' => 1],3);
 // get all posts that contain "hi" in title or content field and have status = 1 field and belong to category with id = 3 with pagination
+```
+
+### Entity
+#### List of query functions - Entity
+Scope a query to only include posts of a given type.
+```php
+public function scopeOfType($query, $type)
+```
+
+Get post collection by type.
+```php
+public static function getByType($type = 'posts')
+```
+
+Get post by type with pagination.
+```php
+public static function getByTypeWithPagination($type = 'posts', $per_page = 15)
+```
+
+Get post by type and id.
+```php
+public static function findByType($id, $type = 'posts')
+```
+
+Get post meta data.
+```php
+public function getMetaField($key)
+```
+
+Scope a query to only include hot posts.
+```php
+public function scopeIsHot($query)
+```
+
+Scope a query to only include publisded posts.
+```php
+public function scopeIsPublished($query)
+```
+
+Scope a query to sort posts by order column.
+```php
+public function scopeSortByOrder($query, $order = 'desc')
+```
+
+Scope a query to sort posts by published_date column.
+```php
+public function scopeSortByPublishedDate($query, $order = 'desc')
+```
+
+Scope a query to include posts of given category.
+```php
+public function scopeOfCategoryBySlug($query, $slug)
+```
+
+Scope a query to include posts of given categories.
+```php
+public function scopeOfCategoriesBySlug($query, $slugs)
+```
+
+Scope a query to search posts of given key word. This function is also able to scope with categories, or tags.
+```php
+public function scopeOfSearching($query, $search, $with_category = false, $with_tag = false)
+```
+#### Use - Entity
+Use Trait.
+```php
+namespace App\Model;
+
+use VCComponent\Laravel\Post\Traits\PostQueryTrait;
+
+class Post 
+{
+    use PostQueryTrait;
+    \\
+}
+```
+
+Extend `VCComponent\Laravel\Post\Entities\Post` Entity.
+```php
+namespace App\Model;
+
+use VCComponent\Laravel\Post\Entities\Post as BasePost;
+
+class Post extends BasePost
+{
+    \\
+}
+```
+
+#### For example - Entity
+
+```php
+Post::ofType('posts')->IsPublised()->isHost()->search('Hello world', false, true)->sortByPublishedDate('desc')->paginate(12);
 ```
 
 ## Table of contents
