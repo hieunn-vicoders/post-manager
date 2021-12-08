@@ -16,9 +16,9 @@
         - [Use](#use)
         - [For example](#for-example)
     - [Entity](#entity)
-        - [List of query functions - Entity](#list-of-query-functions-entity)
-        - [Use - Entity](#use-entity)
-        - [For example - Entity](#for-example-entity)
+        - [List of query functions-Entity](#list-of-query-functions-entity)
+        - [Use-Entity](#use-entity)
+        - [For example-Entity](#for-example-entity)
   - [Table of contents](#table-of-contents)
     - [List of TOC functions](#list-of-toc-functions)
     - [Using of TOC](#using-of-toc)
@@ -251,7 +251,7 @@ $postResult = $this->postRepo->getSearchResultPaginate('hi', ['title','content']
 ```
 
 ### Entity
-#### List of query functions - Entity
+#### List of query functions-Entity
 Scope a query to only include posts of a given type.
 ```php
 public function scopeOfType($query, $type)
@@ -311,7 +311,7 @@ Scope a query to search posts of given key word. This function is also able to s
 ```php
 public function scopeOfSearching($query, $search, $with_category = false, $with_tag = false)
 ```
-#### Use - Entity
+#### Use-Entity
 Use Trait.
 ```php
 namespace App\Model;
@@ -337,7 +337,7 @@ class Post extends BasePost
 }
 ```
 
-#### For example - Entity
+#### For example-Entity
 
 ```php
 Post::ofType('posts')->IsPublised()->isHost()->search('Hello world', false, true)->sortByPublishedDate('desc')->paginate(12);
