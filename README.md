@@ -297,19 +297,14 @@ Scope a query to sort posts by published_date column.
 public function scopeSortByPublishedDate($query, $order = 'desc')
 ```
 
-Scope a query to include posts of given category.
-```php
-public function scopeOfCategoryBySlug($query, $slug)
-```
-
-Scope a query to include posts of given categories.
-```php
-public function scopeOfCategoriesBySlug($query, $slugs)
-```
-
 Scope a query to search posts of given key word. This function is also able to scope with categories, or tags.
 ```php
 public function scopeOfSearching($query, $search, $with_category = false, $with_tag = false)
+```
+
+Scope a query to include related posts. This function is also able to scope with categories, or tags.
+```php
+public function scopeOfRelatingTo($query, $post, $with_category = false, $with_tag = false)
 ```
 #### Use-Entity
 Use Trait.
@@ -336,7 +331,6 @@ class Post extends BasePost
     \\
 }
 ```
-
 #### For example-Entity
 
 ```php

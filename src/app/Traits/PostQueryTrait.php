@@ -125,34 +125,6 @@ trait PostQueryTrait
     }
 
     /**
-     * Scope a query to include posts of given category.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param string $slug
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeOfCategoryBySlug($query, $slug)
-    {
-        return $query->whereHas('categories', function ($q) use ($slug) {
-            $q->where('slug', $slug)->where('status', 1);
-        });
-    }
-
-    /**
-     * Scope a query to include posts of given categories.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param array $slugs
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeOfCategoriesBySlug($query, $slugs)
-    {
-        return $query->whereHas('categories', function ($q) use ($slugs) {
-            $q->whereIn('slug', $slugs)->where('status', 1);
-        });
-    }
-
-    /**
      * Scope a query to search posts of given key word. This function is also able to scope with categories, or tags.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -163,22 +135,47 @@ trait PostQueryTrait
      */
     public function scopeOfSearching($query, $search, $with_category = false, $with_tag = false)
     {
-        $query = $query->where(function($q) use($search) {
+        $query = $query->where(function ($q) use ($search) {
             $q->orWhere('title', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->orWhere('content', 'like', "%{$search}%");
         });
 
-        if ($with_category) {
+        if ($with_category && method_exists($this, 'categories')) {
             $query->whereHas('categories', function ($q) use ($search) {
                 $q->whereIn('name', 'like', "%{$search}%")->where('status', 1);
             });
         }
 
-        if ($with_tag) {
+        if ($with_tag && method_exists($this, 'tags')) {
             $query->whereHas('tags', function ($q) use ($search) {
                 $q->whereIn('name', 'like', "%{$search}%")->where('status', 1);
             });
         }
 
+        return $query;
+    }
+
+    /**
+     * Scope a query to include related posts. This function is also able to scope with categories, or tags.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \VCComponent\Laravel\Post\Entities\Post $post
+     * @param boolean $with_category
+     * @param boolean $with_tag
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfRelatingTo($query, $post, $with_category = false, $with_tag = false)
+    {
+        if ($post) {
+            $query = $query->where('id', '<>', $post->id);
+
+            if ($with_category && count($post->categories)) {
+                $query = $query->ofCategoriesBySlug($post->categories->pluck('slug')->toArray());
+            }
+
+            if ($with_tag && count($post->tags)) {
+                $query = $query->ofTagsBySlug($post->tags->pluck('slug')->toArray());
+            }
+        }
         return $query;
     }
 }
