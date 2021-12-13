@@ -258,7 +258,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $this->getEntity()->where('id', $id)->with('categories')->first();
     }
 
-    public function getPostWithCommnets($id)
+    public function getPostWithComments($id)
     {
         return $this->getEntity()->where('id', $id)->with('comments')->first();
     }
@@ -909,7 +909,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $this->getEntity()->with('languages')->where('id', $id)->with('categories')->first();
     }
 
-    public function getPostTranslatableWithCommnets($id)
+    public function getPostTranslatableWithComments($id)
     {
         return $this->getEntity()->with('languages')->where('id', $id)->with('comments')->first();
     }
