@@ -150,52 +150,46 @@ Configure auth middleware in configuration file `config\post.php`
 ## Query functions provide
 ### Repository
 #### List of query functions
-Find  By Field 
-```php
-public function findByField($field, $value = null, $type = 'posts')
-```
-Get posts of post type by array of conditions
-```php
-public function findByWhere(array $where, $type = 'posts', $number = 10, $order_by = 'order', $order = 'asc');
 
-public function findByWherePaginate(array $where, $type = 'posts', $number = 10, $order_by = 'order', $order = 'asc');
-// Get posts of post type by array of conditions with paginate
-```
-Get image list of the article in size
 ```php
-public function getPostMedias( $post_id, $image_dimension='')
+public function getPostWithMetas($id)
+public function getPostWithCategories($id)
+public function getPostWithCommnets($id)
+public function getPostWithTags($id)
+public function getPostWithMetasCategories($id)
+public function getPostWithMetasComments($id)
+public function getPostWithMetasTags($id)
+public function getPostWithCategoriesComments($id)
+public function getPostWithCategoriesTags($id)
+public function getPostWithCommentsTags($id)
+public function getPostWithAll($id)
+public function getListPostsHasCategories($number_of_posts = null, $type = "posts")
+public function getListPostsHasTags($number_of_posts = null, $type = "posts")
+public function getListPostsWithMetas($number_of_posts = null, $type = "posts")
+public function getListPostsWithCategories($number_of_posts = null, $type = "posts")
+public function getListPostsWithMetasCategories($number_of_posts = null, $type = "posts")
+public function getListHotPosts($number_of_posts = null, $type = "posts")
+public function getListHotPostsHasCategories($number_of_posts = null, $type = "posts")
+public function getListHotPostsHasTags($number_of_posts = null, $type = "posts")
+public function getListHotPostsWithMetas($number_of_posts = null, $type = "posts")
+public function getListHotPostsWithCategories($number_of_posts = null, $type = "posts")
+public function getListHotPostsWithMetasCategories($number_of_posts = null, $type = "posts")
+public function getListRelatedPosts($post, $number_of_posts = null, $type = "posts")
+public function getListRelatedPostsWithMetas($post, $number_of_posts = null, $type = "posts")
+public function getListRelatedPostsWithCategories($post, $number_of_posts = null, $type = "posts")
+public function getListRelatedPostsWithMetasCategories($post, $number_of_posts = null, $type = "posts")
+public function getListOfSearchingPosts($search, $number_of_posts = null, $type = "posts")
+public function getListOfSearchingPostsHasCategoriesTags($search, $number_of_posts = null, $type = "posts")
+public function getListOfSearchingPostsWithMetas($search, $number_of_posts = null, $type = "posts")
+public function getListOfSearchingPostsWithCategories($search, $number_of_posts = null, $type = "posts")
+public function getListOfSearchingPostsHasCategoriesTagsWithMetas($search, $number_of_posts = null, $type = "posts")
+public function getListOfSearchingPostsHasCategoriesTagsWithMetasCategories($search, $number_of_posts = null, $type = "posts")
+public function getListTranslatablePosts($number_of_posts = null, $type = "posts")
 ```
-Get all posts by post type
-```php
-public function getPostsAll( $type = 'posts') 
-```
-Get posts by id
-```php
-public function getPostByID($post_id)
-```
-Get article link
-```php
-public function getPostUrl($post_id)
-```
-Get list of related articles posts
-```php
-public function getRelatedPosts($post_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']);
 
-public function getRelatedPostsPaginate($post_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']);
-// get a list of related posts with pagination
-```
-Get list of posts of a category
-```php
-public function getPostsWithCategory($category_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']);
-public function getPostsWithCategoryPaginate($category_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']);
-// get list of articles of a pagination category
-```
-Search articles by keyword
-```php
-public function getSearchResult($key_word, array $list_field = ['title'],array $where, $category_id = 0,$number = 10,$order_by = 'order', $order = 'asc', $columns = ['*']);
-public function getSearchResultPaginate($key_word, array $list_field  = ['title'], array $where, $category_id = 0, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']);
-// Search articles by keyword with pagination
-```
+We also provide functions that return list paginated posts. In order to use those functions, just add 'paginated' to the functions return the list of posts you want to use.
+For example: `getListHotPosts` will be `getListPaginatedPosts`.
+
 #### Use
 At controller use `PostRepository` and add function `__construct`
 ```php
