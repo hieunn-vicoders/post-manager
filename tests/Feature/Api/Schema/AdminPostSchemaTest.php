@@ -682,6 +682,9 @@ class AdminPostSchemaTest extends TestCase
                 'id' => 5,
                 'name' => 'image',
             ],
+            ["id" => 6, "name" => "audio"],
+            ["id" => 7, "name" => "video"],
+            ["id" => 8, "name" => "file"],
         ];
     }
 }
