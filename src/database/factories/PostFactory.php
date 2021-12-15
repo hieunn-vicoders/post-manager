@@ -3,6 +3,7 @@
 use Faker\Generator as Faker;
 use VCComponent\Laravel\Post\Entities\Post;
 use VCComponent\Laravel\Post\Test\Stubs\Models\WithSchemaAttributes\Post as PostWithSchemaAttributes;
+use Carbon\Carbon;
 
 $factory->define(Post::class, function (Faker $faker) {
     return [
@@ -10,8 +11,10 @@ $factory->define(Post::class, function (Faker $faker) {
         'description' => $faker->sentences(rand(4, 7), true),
         'content'     => $faker->paragraphs(rand(4, 7), true),
         'status'      => 1,
-        "blocks"      => "",
-        "editor_type" => 1
+        "blocks"      => null,
+        "order"       => rand(1, 31),
+        "editor_type" => 1,
+        "type"        => "posts",
     ];
 });
 

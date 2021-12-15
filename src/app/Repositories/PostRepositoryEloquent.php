@@ -245,6 +245,227 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
                     $q->where('categories.id', $category_id); });
             }
         return $query->paginate($number);
+    }
 
+    public function getListHotPosts($numbert_of_posts = null, $type = 'posts')
+    {
+        $query = $this->getEntity()->ofType($type)
+            ->with('postMetas')
+            ->with('categories')
+            ->with('tags')
+            ->where('is_hot', 1)
+            ->where('status', 1)
+            ->orderBy('order', 'asc')
+            ->latest();
+        $query = $numbert_of_posts ? $query->limit($numbert_of_posts) : $query;
+        return $query->get();
+    }
+
+    public function getListRelatedPosts($post, $numbert_of_posts = null)
+    {
+        $query = $this->getEntity()->ofType($post->type)
+            ->with('postMetas')
+            ->with('categories')
+            ->with('tags')
+            ->where('id', '<>', $post->id)
+            ->where('status', 1)
+            ->orderBy('order', 'asc')
+            ->latest();
+        $query = $numbert_of_posts ? $query->limit($numbert_of_posts) : $query;
+        return $query->get();
+    }
+
+    public function getListOfSearchingPosts($search, $numbert_of_posts = null, $type = 'posts', $absolute_search = false)
+    {
+        if (!$absolute_search) {
+            $search = '%' . $search . '%';
+        }
+        
+        $query = $this->getEntity()->ofType($type)
+            ->where(function ($where_query) use ($search) {
+                $where_query
+                ->orWhere('title', 'like', $search)
+                ->orWhere('description', 'like', $search)
+                ->orWhere('content', 'like', $search)
+                ->orWhereHas('categories', function ($q) use ($search) {
+                    $q->where('name', 'like', $search);
+                })
+                ->orWhereHas('categories', function ($q) use ($search) {
+                    $q->where('name', 'like', $search);
+                });
+            })
+            ->with('postMetas')
+            ->with('categories')
+            ->with('tags')
+            ->where('status', 1)
+            ->orderBy('order', 'asc')
+            ->latest();
+        $query = $numbert_of_posts ? $query->limit($numbert_of_posts) : $query;
+        return $query->get();
+    }
+
+    public function getListPaginatedHotPosts($per_page = 15, $type = 'posts')
+    {
+        $query = $this->getEntity()->ofType($type)
+            ->with('postMetas')
+            ->with('categories')
+            ->with('tags')
+            ->where('is_hot', 1)
+            ->where('status', 1)
+            ->orderBy('order', 'asc')
+            ->latest();
+        return $query->paginate($per_page);
+    }
+
+    public function getListPaginatedRelatedPosts($post, $per_page = 15, $type = 'posts')
+    {
+        $query = $this->getEntity()->ofType($type)
+            ->with('postMetas')
+            ->with('categories')
+            ->with('tags')
+            ->where('id', '<>', $post->id)
+            ->where('status', 1)
+            ->orderBy('order', 'asc')
+            ->latest();
+        return $query->paginate($per_page);
+    }
+
+    public function getListPaginatedOfSearchingPosts($search, $per_page = 15, $type = 'posts', $absolute_search = false)
+    {
+        if (!$absolute_search) {
+            $search = '%' . $search . '%';
+        }
+
+        $query = $this->getEntity()->ofType($type)
+            ->where(function ($where_query) use ($search) {
+                $where_query
+                ->orWhere('title', 'like', $search)
+                ->orWhere('description', 'like', $search)
+                ->orWhere('content', 'like', $search)
+                ->orWhereHas('categories', function ($q) use ($search) {
+                    $q->where('name', 'like', $search);
+                })
+                ->orWhereHas('categories', function ($q) use ($search) {
+                    $q->where('name', 'like', $search);
+                });
+            })
+            ->with('postMetas')
+            ->with('categories')
+            ->with('tags')
+            ->where('status', 1)
+            ->orderBy('order', 'asc')
+            ->latest();
+        return $query->paginate($per_page);
+    }
+
+    public function getListTranslatableHotPosts($numbert_of_posts = null, $type = 'posts')
+    {
+        $query = $this->getEntity()->ofType($type)->with('languages')
+            ->with('postMetas')
+            ->with('categories')
+            ->with('tags')
+            ->where('is_hot', 1)
+            ->where('status', 1)
+            ->orderBy('order', 'asc')
+            ->latest();
+        $query = $numbert_of_posts ? $query->limit($numbert_of_posts) : $query;
+        return $query->get();
+    }
+
+    public function getListTransalatableRelatedPosts($post, $numbert_of_posts = null)
+    {
+        $query = $this->getEntity()->ofType($post->type)->with('languages')
+            ->with('postMetas')
+            ->with('categories')
+            ->with('tags')
+            ->where('id', '<>', $post->id)
+            ->where('status', 1)
+            ->orderBy('order', 'asc')
+            ->latest();
+        $query = $numbert_of_posts ? $query->limit($numbert_of_posts) : $query;
+        return $query->get();
+    }
+
+    public function getListTranslatableOfSearchingPosts($search, $numbert_of_posts = null, $type = 'posts', $absolute_search = false)
+    {
+        if (!$absolute_search) {
+            $search = '%' . $search . '%';
+        }
+
+        $query = $this->getEntity()->ofType($type)->with('languages')
+            ->where(function ($where_query) use ($search) {
+                $where_query
+                ->orWhere('title', 'like', $search)
+                ->orWhere('description', 'like', $search)
+                ->orWhere('content', 'like', $search)
+                ->orWhereHas('categories', function ($q) use ($search) {
+                    $q->where('name', 'like', $search);
+                })
+                ->orWhereHas('categories', function ($q) use ($search) {
+                    $q->where('name', 'like', $search);
+                });
+            })
+            ->with('postMetas')
+            ->with('categories')
+            ->with('tags')
+            ->where('status', 1)
+            ->orderBy('order', 'asc')
+            ->latest();
+        $query = $numbert_of_posts ? $query->limit($numbert_of_posts) : $query;
+        return $query->get();
+    }
+
+    public function getListPaginatedTranslatableHotPosts($per_page = 15, $type = 'posts')
+    {
+        $query = $this->getEntity()->ofType($type)->with('languages')
+            ->with('postMetas')
+            ->with('categories')
+            ->with('tags')
+            ->where('is_hot', 1)
+            ->where('status', 1)
+            ->orderBy('order', 'asc')
+            ->latest();
+        return $query->paginate($per_page);
+    }
+
+    public function getListPaginatedTranslatableRelatedPosts($post, $per_page = 15)
+    {
+        $query = $this->getEntity()->ofType($post->type)->with('languages')
+            ->with('postMetas')
+            ->with('categories')
+            ->with('tags')
+            ->where('id', '<>', $post->id)
+            ->where('status', 1)
+            ->orderBy('order', 'asc')
+            ->latest();
+        return $query->paginate($per_page);
+    }
+
+    public function getListPaginatedTranslatableOfSearchingPosts($search, $per_page = 15, $type = 'posts', $absolute_search = false)
+    {
+        if (!$absolute_search) {
+            $search = '%' . $search . '%';
+        }
+
+        $query = $this->getEntity()->ofType($type)->with('languages')
+            ->where(function ($where_query) use ($search) {
+                $where_query
+                ->orWhere('title', 'like', $search)
+                ->orWhere('description', 'like', $search)
+                ->orWhere('content', 'like', $search)
+                ->orWhereHas('categories', function ($q) use ($search) {
+                    $q->where('name', 'like', $search);
+                })
+                ->orWhereHas('categories', function ($q) use ($search) {
+                    $q->where('name', 'like', $search);
+                });
+            })
+            ->with('postMetas')
+            ->with('categories')
+            ->with('tags')
+            ->where('status', 1)
+            ->orderBy('order', 'asc')
+            ->latest();
+        return $query->paginate($per_page);
     }
 }
