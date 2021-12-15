@@ -4,6 +4,7 @@ namespace VCComponent\Laravel\Post\Test;
 
 use Cviebrock\EloquentSluggable\ServiceProvider;
 use Dingo\Api\Provider\LaravelServiceProvider;
+use NF\Roles\RolesServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use VCComponent\Laravel\Post\Entities\Post;
 use VCComponent\Laravel\Post\Providers\PostComponentProvider;
@@ -13,6 +14,9 @@ use VCComponent\Laravel\User\Entities\User;
 use VCComponent\Laravel\User\Providers\UserComponentEventProvider;
 use VCComponent\Laravel\User\Providers\UserComponentProvider;
 use VCComponent\Laravel\User\Providers\UserComponentRouteProvider;
+use VCComponent\Laravel\Category\Providers\CategoryServiceProvider;
+use VCComponent\Laravel\Tag\Providers\TagServiceProvider;
+use NF\Roles\Models\Role;
 
 class TestCase extends OrchestraTestCase
 {
@@ -36,6 +40,9 @@ class TestCase extends OrchestraTestCase
             UserComponentEventProvider::class,
             UserComponentProvider::class,
             UserComponentRouteProvider::class,
+            RolesServiceProvider::class,
+            CategoryServiceProvider::class,
+            TagServiceProvider::class,
         ];
     }
 
@@ -125,6 +132,8 @@ class TestCase extends OrchestraTestCase
         $app['config']->set('auth.providers.users.model', \VCComponent\Laravel\User\Entities\User::class);
         $app['config']->set('user', ['namespace' => 'user-management']);
         $app['config']->set('repository.cache.enabled', false);
+        $app['config']->set('roles.models.role', \NF\Roles\Models\Role::class);
+        $app['config']->set('roles.models.permission', \NF\Roles\Models\Permission::class);
 
     }
     public function assertExits($response, $error_message)
@@ -158,6 +167,13 @@ class TestCase extends OrchestraTestCase
         $dataLogin = ['username' => 'admin', 'password' => '123456789', 'email' => 'admin@test.com'];
         $user = factory(User::class)->make($dataLogin);
         $user->save();
+
+        $admin_role = factory(Role::class)->create([
+            'name' => 'admin',
+            'slug' => 'admin'
+        ]); 
+
+        $user->attachRole($admin_role);
         $login = $this->json('POST', 'api/user-management/login', $dataLogin);
 
         $token = $login->Json()['token'];
