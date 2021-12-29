@@ -5,6 +5,7 @@ namespace VCComponent\Laravel\Post\Validators;
 use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use VCComponent\Laravel\Post\Entities\PostSchema;
 use VCComponent\Laravel\Post\Validators\PostValidatorInterface;
 use VCComponent\Laravel\Vicoders\Core\Validators\AbstractValidator;
 use VCComponent\Laravel\Vicoders\Core\Validators\ValidatorInterface;
@@ -74,15 +75,13 @@ class PostValidator extends AbstractValidator implements PostValidatorInterface
 
     private function getSchemaFunction($entity, $type)
     {
-        $schema = null;
-
-        if (count($entity->postTypes()) && $type !== 'posts') {
-            $schema_func = Str::camel($type . '_schema');
-            $schema      = collect($entity->$schema_func());
-        } elseif ($type == 'posts') {
-            $schema = collect($entity->schema());
-        }
-
+        $schema = PostSchema::where('post_type', $type.' ')->with('schemaType')->with('schemaRule')->get()->mapWithKeys(function ($post) {
+            return [$post->name => [
+                'type' => $post->schemaType->name,
+                'label' => $post->label,
+                'rule' => []
+            ]];
+        });
         return $schema;
     }
 

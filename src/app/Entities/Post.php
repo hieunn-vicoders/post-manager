@@ -52,16 +52,6 @@ class Post extends Model implements Transformable, PostSchema, PostManagement
         ];
     }
 
-    public function schema()
-    {
-        return [
-            'alt_image' => [
-                'type' => 'string',
-                'rule' => [],
-            ],
-        ];
-    }
-
     public function getLimitDescription($limit = 30)
     {
         return Str::limit($this->description, $limit);
