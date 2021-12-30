@@ -485,7 +485,7 @@ class FrontendPostControllerTest extends TestCase
      */
     public function can_create_schema_when_create_post__by_frontend_router()
     {
-        $schemas = factory(PostSchema::class, 1)->create();
+        $schemas = factory(PostSchema::class, 1)->create(['post_type' => 'posts']);
         $post_metas = [];
         foreach ($schemas as $schema) {
             $post_metas[$schema->name] = $schema->name . "_value";
