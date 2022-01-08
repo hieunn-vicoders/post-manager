@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use VCComponent\Laravel\Post\Entities\PostSchema;
+use VCComponent\Laravel\Post\Entities\PostBlocks;
 use VCComponent\Laravel\Post\Events\PostCreatedByAdminEvent;
 use VCComponent\Laravel\Post\Events\PostDeletedEvent;
 use VCComponent\Laravel\Post\Events\PostUpdatedByAdminEvent;
@@ -102,7 +103,7 @@ trait PostAdminMethods
 
     public function index(Request $request)
     {
-
+        
         $query = $this->entity;
         $query = $this->getFromDate($request, $query);
         $query = $this->getToDate($request, $query);
@@ -212,7 +213,6 @@ trait PostAdminMethods
         $this->validator->isSchemaValid($data['schema'], $schema_rules);
 
         $data['default']['author_id'] = $user ? $user->id : null;
-
         $post = $this->repository->create($data['default']);
         $post->type = $this->type;
         $post->save();
@@ -235,7 +235,10 @@ trait PostAdminMethods
                 ]);
             }
         }
-
+        $post->postBlocks()->updateOrcreate([
+            'post_id'=>$post->id,
+            "blocks" => json_encode($data['default']['postBlocks'])
+        ]);
         event(new PostCreatedByAdminEvent($post));
 
         return $this->response->item($post, new $this->transformer);
@@ -276,7 +279,10 @@ trait PostAdminMethods
                 $post->postMetas()->updateOrCreate(['key' => $key], ['value' => $value]);
             }
         }
-
+        $post->postBlocks()->update([
+            'post_id'=>$post->id,
+            "blocks" => json_encode($data['default']['postBlocks'])
+        ]);
         event(new PostUpdatedByAdminEvent($post));
 
         return $this->response->item($post, new $this->transformer);

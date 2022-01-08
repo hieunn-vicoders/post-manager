@@ -39,7 +39,6 @@ class Post extends Model implements Transformable, PostSchema, PostManagement
         'thumbnail',
         'is_hot',
         'slug',
-        'blocks',
         'editor_type',
     ];
 
@@ -65,5 +64,9 @@ class Post extends Model implements Transformable, PostSchema, PostManagement
     public function scopeHot($query)
     {
         return $query->where('is_hot', self::HOT);
+    }
+    public function postBlocks()
+    {
+        return $this->hasOne(PostBlocks::class);
     }
 }
