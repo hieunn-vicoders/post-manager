@@ -2,7 +2,7 @@
 
 namespace VCComponent\Laravel\Post\Contracts;
 
-interface PostBlocks
+interface PostBlock
 {
     public function posts();
 }

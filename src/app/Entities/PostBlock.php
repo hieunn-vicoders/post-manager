@@ -13,6 +13,6 @@ class PostBlocks extends Model
 
     public function posts()
     {
-        return $this->beLongsTo(Posts::class);
+        return $this->beLongsTo(Post::class);
     }
 }
