@@ -29,8 +29,10 @@ $api->version('v1', function ($api) use ($postTypes) {
             $api->get('posts/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@list');
             $api->put('posts/status/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkUpdateStatus');
             $api->put('posts/{id}/status', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@updateStatusItem');
+            $api->get('posts/{id}/post-block', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getPostBlocks');
             $api->delete('posts/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDelete');
             $api->resource('posts', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface');
+            
             $api->get('postTypes', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getType');
 
             $api->get('pages/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@list');
@@ -46,7 +48,7 @@ $api->version('v1', function ($api) use ($postTypes) {
 
             $api->get('post-schema-rules', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostSchemaRuleController@index');
             $api->get('post-schema-rules/all', 'VCComponent\Laravel\Post\Http\Controllers\Api\Admin\PostSchemaRuleController@list');
-
+            
             if (count($postTypes)) {
                 foreach ($postTypes as $resource) {
                     $api->get($resource . '/field-meta', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getFieldMeta');
