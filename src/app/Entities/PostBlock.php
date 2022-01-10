@@ -3,7 +3,7 @@ namespace VCComponent\Laravel\Post\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PostBlocks extends Model
+class PostBlock extends Model
 {
 
     protected $fillable = [

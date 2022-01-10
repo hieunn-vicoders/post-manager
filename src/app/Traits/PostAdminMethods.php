@@ -199,17 +199,17 @@ trait PostAdminMethods
     }
     public function getPostBlocks($id)
     {
-        $postBlock = $this->postBlockRepository->findWhere(['post_id' => $id])->get();
+        $postBlock = $this->postBlockRepository->findWhere(['post_id' => $id]);
 
-        if (config('post.auth_middleware.admin.middleware') !== '') {
-            $user = $this->getAuthenticatedUser();
-            if (Gate::forUser($user)->denies('view', $postBlock)) {
-                throw new PermissionDeniedException();
-            }
-        }
+        // if (config('post.auth_middleware.admin.middleware') !== '') {
+        //     $user = $this->getAuthenticatedUser();
+        //     if (Gate::forUser($user)->denies('view', $postBlock)) {
+        //         throw new PermissionDeniedException();
+        //     }
+        // }
         $transformer = PostBlockTransformer::class;
 
-        return $this->response->item($postBlock, $transformer);
+        return $this->response->collection($postBlock, $transformer);
     }
     
     public function store(Request $request)

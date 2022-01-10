@@ -4,7 +4,7 @@ namespace VCComponent\Laravel\Post\Transformers;
 
 use League\Fractal\TransformerAbstract;
 
-class PostBlocksTransformer extends TransformerAbstract
+class PostBlockTransformer extends TransformerAbstract
 {
 
     public function transform($model)

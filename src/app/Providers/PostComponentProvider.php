@@ -20,6 +20,8 @@ use VCComponent\Laravel\Post\Http\Controllers\Web\PostListController as ViewPost
 use VCComponent\Laravel\Post\Policies\PostPolicy;
 use VCComponent\Laravel\Post\Repositories\DraftableRepository;
 use VCComponent\Laravel\Post\Repositories\DraftableRepositoryEloquent;
+use VCComponent\Laravel\Post\Repositories\PostBlockRepository;
+use VCComponent\Laravel\Post\Repositories\PostBlockRepositoryEloquent;
 use VCComponent\Laravel\Post\Repositories\PostRepository;
 use VCComponent\Laravel\Post\Repositories\PostRepositoryEloquent;
 use VCComponent\Laravel\Post\Repositories\PostSchemaRepository;
@@ -84,6 +86,7 @@ class PostComponentProvider extends ServiceProvider
         $this->app->bind(PostSchemaRepository::class, PostSchemaRepositoryEloquent::class);
         $this->app->bind(PostSchemaTypeRepository::class, PostSchemaTypeRepositoryEloquent::class);
         $this->app->bind(PostSchemaRuleRepository::class, PostSchemaRuleRepositoryEloquent::class);
+        $this->app->bind(PostBlockRepository::class, PostBlockRepositoryEloquent::class);
 
         $this->registerViewModels();
         $this->registerControllers();

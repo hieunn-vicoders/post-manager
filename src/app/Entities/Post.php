@@ -67,6 +67,6 @@ class Post extends Model implements Transformable, PostSchema, PostManagement
     }
     public function postBlocks()
     {
-        return $this->hasOne(PostBlocks::class);
+        return $this->hasOne(PostBlock::class);
     }
 }
