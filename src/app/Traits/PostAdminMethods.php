@@ -104,6 +104,16 @@ trait PostAdminMethods
         return $query;
     }
 
+    public function whereHasCategory($request, $query)
+    {
+        if ($request->category) {
+            $query = $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('slug', $request->category);
+            });
+        }
+        return $query;
+    }
+
     public function index(Request $request)
     {
         
@@ -111,7 +121,7 @@ trait PostAdminMethods
         $query = $this->getFromDate($request, $query);
         $query = $this->getToDate($request, $query);
         $query = $this->getStatus($request, $query);
-
+        $query = $this->whereHasCategory($request, $query);
         $query = $this->applyQueryScope($query, 'type', $this->type);
         $query = $this->applyConstraintsFromRequest($query, $request);
         $query = $this->applySearchFromRequest($query, ['title', 'description', 'content'], $request, ['postMetas' => ['value']]);
