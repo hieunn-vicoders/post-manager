@@ -317,9 +317,9 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->paginate($per_page);
     }
 
-    public function getListPaginatedRelatedPosts($post, $per_page = 15, $type = 'posts')
+    public function getListPaginatedRelatedPosts($post, $per_page = 15)
     {
-        $query = $this->getEntity()->ofType($type)
+        $query = $this->getEntity()->ofType($post->type)
             ->with('postMetas')
             ->with('categories')
             ->with('tags')
@@ -358,7 +358,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->paginate($per_page);
     }
 
-    public function getListTranslatableHotPosts($numbert_of_posts = null, $type = 'posts')
+    public function getListHotTranslatablePosts($numbert_of_posts = null, $type = 'posts')
     {
         $query = $this->getEntity()->ofType($type)->with('languages')
             ->with('postMetas')
@@ -372,7 +372,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->get();
     }
 
-    public function getListTransalatableRelatedPosts($post, $numbert_of_posts = null)
+    public function getListRelatedTranslatablePosts($post, $numbert_of_posts = null)
     {
         $query = $this->getEntity()->ofType($post->type)->with('languages')
             ->with('postMetas')
@@ -386,7 +386,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->get();
     }
 
-    public function getListTranslatableOfSearchingPosts($search, $numbert_of_posts = null, $type = 'posts', $absolute_search = false)
+    public function getListOfSearchingTranslatablePosts($search, $numbert_of_posts = null, $type = 'posts', $absolute_search = false)
     {
         if (!$absolute_search) {
             $search = '%' . $search . '%';
@@ -415,7 +415,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->get();
     }
 
-    public function getListPaginatedTranslatableHotPosts($per_page = 15, $type = 'posts')
+    public function getListPaginatedHotTranslatablePosts($per_page = 15, $type = 'posts')
     {
         $query = $this->getEntity()->ofType($type)->with('languages')
             ->with('postMetas')
@@ -428,7 +428,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->paginate($per_page);
     }
 
-    public function getListPaginatedTranslatableRelatedPosts($post, $per_page = 15)
+    public function getListPaginatedRelatedTranslatablePosts($post, $per_page = 15)
     {
         $query = $this->getEntity()->ofType($post->type)->with('languages')
             ->with('postMetas')
@@ -441,7 +441,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->paginate($per_page);
     }
 
-    public function getListPaginatedTranslatableOfSearchingPosts($search, $per_page = 15, $type = 'posts', $absolute_search = false)
+    public function getListPaginatedOfSearchingTranslatablePosts($search, $per_page = 15, $type = 'posts', $absolute_search = false)
     {
         if (!$absolute_search) {
             $search = '%' . $search . '%';

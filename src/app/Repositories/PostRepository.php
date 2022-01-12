@@ -26,4 +26,18 @@ interface PostRepository extends RepositoryInterface
     public function getPostsWithCategoryPaginate($category_id, array $where, $number = 10, $order_by = 'order', $order = 'asc', $columns = ['*']);
     public function getSearchResult($key_word,array $list_field  = ['title'], array $where, $category_id = 0,$number = 10,$order_by = 'order', $order = 'asc', $columns = ['*']);
     public function getSearchResultPaginate($key_word, array $list_field  = ['title'], array $where, $category_id = 0,$number = 10,$order_by = 'order', $order = 'asc', $columns = ['*']);
+
+    public function getListHotPosts($numbert_of_posts = null, $type = 'posts');
+    public function getListRelatedPosts($post, $numbert_of_posts = null);
+    public function getListOfSearchingPosts($search, $numbert_of_posts = null, $type = 'posts', $absolute_search = false);
+    public function getListPaginatedHotPosts($per_page = 15, $type = 'posts');
+    public function getListPaginatedRelatedPosts($post, $per_page = 15);
+    public function getListPaginatedOfSearchingPosts($search, $per_page = 15, $type = 'posts', $absolute_search = false);
+
+    public function getListHotTranslatablePosts($numbert_of_posts = null, $type = 'posts');
+    public function getListRelatedTranslatablePosts($post, $numbert_of_posts = null);
+    public function getListOfSearchingTranslatablePosts($search, $numbert_of_posts = null, $type = 'posts', $absolute_search = false);
+    public function getListPaginatedHotTranslatablePosts($per_page = 15, $type = 'posts');
+    public function getListPaginatedRelatedTranslatablePosts($post, $per_page = 15);
+    public function getListPaginatedOfSearchingTranslatablePosts($search, $per_page = 15, $type = 'posts', $absolute_search = false);
 }

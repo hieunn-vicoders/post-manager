@@ -9,6 +9,7 @@ use VCComponent\Laravel\Comment\Transformers\CommentTransformer;
 use VCComponent\Laravel\MediaManager\Transformers\MediaTransformer;
 use VCComponent\Laravel\Tag\Transformers\TagTransformer;
 use VCComponent\Laravel\Post\Transformers\PostMetaTransformer;
+use VCComponent\Laravel\Post\Transformers\PostBlocksTransformer;
 
 class PostTransformer extends TransformerAbstract
 {
@@ -18,10 +19,11 @@ class PostTransformer extends TransformerAbstract
         'tags',
         'media',
         'categories',
-        'postMetas'
+        'postMetas',
+        'postBlocks'
     ];
 
-    public function __construct($includes = [])
+    public function __construct($includes = ['postBlocks'])
     {
         $this->setDefaultIncludes($includes);
     }
@@ -41,7 +43,6 @@ class PostTransformer extends TransformerAbstract
             'order'          => (int) $model->order,
             'status'         => (int) $model->status,
             'published_date' => $model->published_date,
-            'blocks'         => json_decode($model->blocks),
             'editor_type'    => (int) $model->editor_type,
         ];
 
@@ -50,7 +51,6 @@ class PostTransformer extends TransformerAbstract
                 $transform[$item['key']] = $item['value'];
             }
         }
-
         $transform['timestamps'] = [
             'created_at' => $model->created_at,
             'updated_at' => $model->updated_at,
@@ -93,5 +93,11 @@ class PostTransformer extends TransformerAbstract
     public function includePostMetas($model)
     {
         return $this->collection($model->postMetas, new PostMetaTransformer());
+    }
+    public function includePostBlocks($model)
+    {
+        if ($model->postBlocks) {
+            return $this->item($model->postBlocks, new PostBlocksTransformer());
+        }
     }
 }

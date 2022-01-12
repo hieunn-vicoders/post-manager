@@ -8,21 +8,25 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use VCComponent\Laravel\Post\Entities\PostSchema;
+use VCComponent\Laravel\Post\Entities\PostBlock;
 use VCComponent\Laravel\Post\Events\PostCreatedByAdminEvent;
 use VCComponent\Laravel\Post\Events\PostDeletedEvent;
 use VCComponent\Laravel\Post\Events\PostUpdatedByAdminEvent;
 use VCComponent\Laravel\Post\Repositories\PostRepository;
+use VCComponent\Laravel\Post\Repositories\PostBlockRepository;
 use VCComponent\Laravel\Post\Transformers\PostSchemaTransformer;
 use VCComponent\Laravel\Post\Transformers\PostTransformer;
+use VCComponent\Laravel\Post\Transformers\PostBlockTransformer;
 use VCComponent\Laravel\Post\Validators\PostValidatorInterface;
 use VCComponent\Laravel\Vicoders\Core\Exceptions\NotFoundException;
 use VCComponent\Laravel\Vicoders\Core\Exceptions\PermissionDeniedException;
 
 trait PostAdminMethods
 {
-    public function __construct(PostRepository $repository, PostValidatorInterface $validator, Request $request)
+    public function __construct(PostRepository $repository, PostBlockRepository $postBlockRepository, PostValidatorInterface $validator, Request $request)
     {
         $this->repository = $repository;
+        $this->postBlockRepository = $postBlockRepository;
         $this->entity = $repository->getEntity();
         $this->validator = $validator;
         $this->type = $this->getPostTypeFromRequest($request);
@@ -102,7 +106,7 @@ trait PostAdminMethods
 
     public function index(Request $request)
     {
-
+        
         $query = $this->entity;
         $query = $this->getFromDate($request, $query);
         $query = $this->getToDate($request, $query);
@@ -193,7 +197,21 @@ trait PostAdminMethods
 
         return $this->response->item($post, $transformer);
     }
+    public function getPostBlocks($id)
+    {
+        $postBlock = $this->postBlockRepository->findWhere(['post_id' => $id]);
 
+        // if (config('post.auth_middleware.admin.middleware') !== '') {
+        //     $user = $this->getAuthenticatedUser();
+        //     if (Gate::forUser($user)->denies('view', $postBlock)) {
+        //         throw new PermissionDeniedException();
+        //     }
+        // }
+        $transformer = PostBlockTransformer::class;
+
+        return $this->response->collection($postBlock, $transformer);
+    }
+    
     public function store(Request $request)
     {
         $user = null;
@@ -212,7 +230,6 @@ trait PostAdminMethods
         $this->validator->isSchemaValid($data['schema'], $schema_rules);
 
         $data['default']['author_id'] = $user ? $user->id : null;
-
         $post = $this->repository->create($data['default']);
         $post->type = $this->type;
         $post->save();
@@ -235,7 +252,10 @@ trait PostAdminMethods
                 ]);
             }
         }
-
+        $post->postBlocks()->updateOrcreate([
+            'post_id'=>$post->id,
+            "blocks" => json_encode($data['default']['postBlocks'])
+        ]);
         event(new PostCreatedByAdminEvent($post));
 
         return $this->response->item($post, new $this->transformer);
@@ -276,7 +296,10 @@ trait PostAdminMethods
                 $post->postMetas()->updateOrCreate(['key' => $key], ['value' => $value]);
             }
         }
-
+        $post->postBlocks()->update([
+            'post_id'=>$post->id,
+            "blocks" => json_encode($data['default']['postBlocks'])
+        ]);
         event(new PostUpdatedByAdminEvent($post));
 
         return $this->response->item($post, new $this->transformer);
