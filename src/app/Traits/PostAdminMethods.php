@@ -262,10 +262,12 @@ trait PostAdminMethods
                 ]);
             }
         }
-        $post->postBlocks()->updateOrcreate([
-            'post_id'=>$post->id,
-            "blocks" => json_encode($data['default']['postBlocks'])
-        ]);
+        if (isset($data['default']['postBlocks'])) {
+            $post->postBlocks()->updateOrcreate([
+                'post_id'=>$post->id,
+                "blocks" => json_encode($data['default']['postBlocks'])
+            ]);
+        }
         event(new PostCreatedByAdminEvent($post));
 
         return $this->response->item($post, new $this->transformer);
@@ -306,10 +308,13 @@ trait PostAdminMethods
                 $post->postMetas()->updateOrCreate(['key' => $key], ['value' => $value]);
             }
         }
-        $post->postBlocks()->update([
-            'post_id'=>$post->id,
-            "blocks" => json_encode($data['default']['postBlocks'])
-        ]);
+        
+        if (isset($data['default']['postBlocks'])) {
+            $post->postBlocks()->update([
+                'post_id' => $post->id,
+                "blocks" => json_encode($data['default']['postBlocks']),
+            ]);
+        }
         event(new PostUpdatedByAdminEvent($post));
 
         return $this->response->item($post, new $this->transformer);
