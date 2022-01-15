@@ -9,7 +9,6 @@ use VCComponent\Laravel\Comment\Transformers\CommentTransformer;
 use VCComponent\Laravel\MediaManager\Transformers\MediaTransformer;
 use VCComponent\Laravel\Tag\Transformers\TagTransformer;
 use VCComponent\Laravel\Post\Transformers\PostMetaTransformer;
-use VCComponent\Laravel\Post\Transformers\PostBlocksTransformer;
 
 class PostTransformer extends TransformerAbstract
 {
@@ -20,10 +19,10 @@ class PostTransformer extends TransformerAbstract
         'media',
         'categories',
         'postMetas',
-        'postBlocks'
+        'post_blocks'
     ];
 
-    public function __construct($includes = ['postBlocks'])
+    public function __construct($includes = [])
     {
         $this->setDefaultIncludes($includes);
     }
@@ -97,7 +96,7 @@ class PostTransformer extends TransformerAbstract
     public function includePostBlocks($model)
     {
         if ($model->postBlocks) {
-            return $this->item($model->postBlocks, new PostBlocksTransformer());
+            return $this->item($model->postBlocks, new PostBlockTransformer());
         }
     }
 }

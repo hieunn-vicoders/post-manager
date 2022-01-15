@@ -8,6 +8,6 @@ use Carbon\Carbon;
 $factory->define(PostBlock::class, function (Faker $faker) {
     return [
         'post_id'       => rand(1, 31),
-        'blocks' => json_encode(['key' => rand(1, 31)]),
+        'block' => json_encode(['key' => rand(1, 31)]),
     ];
 });
