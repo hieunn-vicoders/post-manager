@@ -40,7 +40,7 @@ class PostBlockTest extends TestCase
 
         $token = $this->loginToken();
         $data = factory(Post::class)->make([
-            'post_blocks' => [
+            'blocks' => [
                 ['key' => 'asdasd'],
                 ['key' => 'sdasdads'],
             ]
@@ -63,7 +63,7 @@ class PostBlockTest extends TestCase
             ['block' => '{"name":"nvb","age":"23"}'],
         ]);
         $data = factory(Post::class)->make([
-            'post_blocks' => [
+            'blocks' => [
                 ['key' => 'asdasd'],
                 ['key' => 'sdasdads'],
             ]
@@ -83,7 +83,7 @@ class PostBlockTest extends TestCase
         $token = $this->loginToken();
         $post = factory(Post::class)->create();
         $data = factory(Post::class)->make([
-            'post_blocks' => [
+            'blocks' => [
                 ['key' => 'asdasd'],
                 ['key' => 'sdasdads'],
             ]

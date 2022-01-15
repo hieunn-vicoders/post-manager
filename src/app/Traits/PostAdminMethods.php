@@ -268,9 +268,9 @@ trait PostAdminMethods
             }
         }
 
-        if (isset($data['default']['post_blocks'])) 
+        if (isset($data['default']['blocks'])) 
         {
-            $post_block_datas = collect($data['default']['post_blocks'])->map(function ($block) {
+            $post_block_datas = collect($data['default']['blocks'])->map(function ($block) {
                 return ["block" => json_encode($block)];
             })->toArray();
             $post->postBlocks()->createMany(
@@ -319,9 +319,9 @@ trait PostAdminMethods
         }
         
         $post->postBlocks()->delete();
-        if (isset($data['default']['post_blocks'])) 
+        if (isset($data['default']['blocks'])) 
         {
-            $post_block_datas = collect($data['default']['post_blocks'])->map(function ($block) {
+            $post_block_datas = collect($data['default']['blocks'])->map(function ($block) {
                 return ["block" => json_encode($block)];
             })->toArray();
             $post->postBlocks()->createMany(
