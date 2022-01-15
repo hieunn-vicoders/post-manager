@@ -426,6 +426,7 @@ The api endpoint should have these format:
 | DELETE | /api/{namespace}/admin/{post-type}/{id}        |
 | PUT    | /api/{namespace}/admin/{post-type}/status/bulk |
 | PUT    | /api/{namespace}/admin/{post-type}/status/{id} |
+| GET    | /api/{namespace}/admin/{post-type}/{id}/blocks |
 | ----   | ----                                           |
 | GET    | /api/{namespace}/{post-type}                   |
 | GET    | /api/{namespace}/{post-type}/{id}              |

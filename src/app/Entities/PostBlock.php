@@ -8,10 +8,10 @@ class PostBlock extends Model
 
     protected $fillable = [
         'post_id',
-        'blocks',
+        'block',
     ];
 
-    public function posts()
+    public function post()
     {
         return $this->beLongsTo(Post::class);
     }

@@ -29,7 +29,7 @@ $api->version('v1', function ($api) use ($postTypes) {
             $api->get('posts/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@list');
             $api->put('posts/status/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkUpdateStatus');
             $api->put('posts/{id}/status', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@updateStatusItem');
-            $api->get('posts/{id}/post-block', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getPostBlocks');
+            $api->get('posts/{id}/blocks', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getPostBlocks');
             $api->delete('posts/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkDelete');
             $api->resource('posts', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface');
             
@@ -65,7 +65,7 @@ $api->version('v1', function ($api) use ($postTypes) {
                     $api->get($resource . '/all', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@list');
                     $api->put($resource . '/status/bulk', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@bulkUpdateStatus');
                     $api->put($resource . '/{id}/status', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@updateStatusItem');
-                    $api->get($resource . '/{id}/post-block', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getPostBlocks');
+                    $api->get($resource . '/{id}/blocks', 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface@getPostBlocks');
                     $api->resource($resource, 'VCComponent\Laravel\Post\Contracts\AdminPostControllerInterface');
                 }
             }

@@ -104,6 +104,16 @@ trait PostAdminMethods
         return $query;
     }
 
+    public function whereHasCategory($request, $query)
+    {
+        if ($request->category) {
+            $query = $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('slug', $request->category);
+            });
+        }
+        return $query;
+    }
+
     public function index(Request $request)
     {
         
@@ -111,7 +121,7 @@ trait PostAdminMethods
         $query = $this->getFromDate($request, $query);
         $query = $this->getToDate($request, $query);
         $query = $this->getStatus($request, $query);
-
+        $query = $this->whereHasCategory($request, $query);
         $query = $this->applyQueryScope($query, 'type', $this->type);
         $query = $this->applyConstraintsFromRequest($query, $request);
         $query = $this->applySearchFromRequest($query, ['title', 'description', 'content'], $request, ['postMetas' => ['value']]);
@@ -199,17 +209,22 @@ trait PostAdminMethods
     }
     public function getPostBlocks($id)
     {
-        $postBlock = $this->postBlockRepository->findWhere(['post_id' => $id]);
+        $post = $this->repository->findWhere(['id' => $id])->first();
+        if (!$post) {
+            throw new NotFoundException(($this->type) . ' entity');
+        }
+        
+        if (config('post.auth_middleware.admin.middleware') !== '') {
+            $user = $this->getAuthenticatedUser();
+            if (Gate::forUser($user)->denies('view', $post)) {
+                throw new PermissionDeniedException();
+            }
+        }
 
-        // if (config('post.auth_middleware.admin.middleware') !== '') {
-        //     $user = $this->getAuthenticatedUser();
-        //     if (Gate::forUser($user)->denies('view', $postBlock)) {
-        //         throw new PermissionDeniedException();
-        //     }
-        // }
+        $post_blocks = $this->postBlockRepository->findWhere(['post_id' => $id]);
+
         $transformer = PostBlockTransformer::class;
-
-        return $this->response->collection($postBlock, $transformer);
+        return $this->response->collection($post_blocks, $transformer);
     }
     
     public function store(Request $request)
@@ -252,11 +267,15 @@ trait PostAdminMethods
                 ]);
             }
         }
-        if (isset($data['default']['postBlocks'])) {
-            $post->postBlocks()->updateOrcreate([
-                'post_id'=>$post->id,
-                "blocks" => json_encode($data['default']['postBlocks'])
-            ]);
+
+        if (isset($data['default']['blocks'])) 
+        {
+            $post_block_datas = collect($data['default']['blocks'])->map(function ($block) {
+                return ["block" => json_encode($block)];
+            })->toArray();
+            $post->postBlocks()->createMany(
+                $post_block_datas
+            );
         }
         event(new PostCreatedByAdminEvent($post));
 
@@ -299,11 +318,15 @@ trait PostAdminMethods
             }
         }
         
-        if (isset($data['default']['postBlocks'])) {
-            $post->postBlocks()->update([
-                'post_id' => $post->id,
-                "blocks" => json_encode($data['default']['postBlocks']),
-            ]);
+        $post->postBlocks()->delete();
+        if (isset($data['default']['blocks'])) 
+        {
+            $post_block_datas = collect($data['default']['blocks'])->map(function ($block) {
+                return ["block" => json_encode($block)];
+            })->toArray();
+            $post->postBlocks()->createMany(
+                $post_block_datas
+            );
         }
         event(new PostUpdatedByAdminEvent($post));
 

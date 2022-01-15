@@ -11,7 +11,7 @@ class PostBlockTransformer extends TransformerAbstract
     {
         return [
             'id'             => $model->id,
-            'blocks'         => $model->blocks,
+            'block'         => json_decode($model->block),
             'timestamps'     => [
                 'created_at' => $model->created_at,
                 'updated_at' => $model->updated_at,
