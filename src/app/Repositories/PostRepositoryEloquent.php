@@ -290,7 +290,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
                 ->orWhereHas('categories', function ($q) use ($search) {
                     $q->where('name', 'like', $search);
                 })
-                ->orWhereHas('categories', function ($q) use ($search) {
+                ->orWhereHas('tags', function ($q) use ($search) {
                     $q->where('name', 'like', $search);
                 });
             })
@@ -345,7 +345,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
                 ->orWhereHas('categories', function ($q) use ($search) {
                     $q->where('name', 'like', $search);
                 })
-                ->orWhereHas('categories', function ($q) use ($search) {
+                ->orWhereHas('tags', function ($q) use ($search) {
                     $q->where('name', 'like', $search);
                 });
             })
@@ -401,7 +401,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
                 ->orWhereHas('categories', function ($q) use ($search) {
                     $q->where('name', 'like', $search);
                 })
-                ->orWhereHas('categories', function ($q) use ($search) {
+                ->orWhereHas('tags', function ($q) use ($search) {
                     $q->where('name', 'like', $search);
                 });
             })
@@ -456,7 +456,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
                 ->orWhereHas('categories', function ($q) use ($search) {
                     $q->where('name', 'like', $search);
                 })
-                ->orWhereHas('categories', function ($q) use ($search) {
+                ->orWhereHas('tags', function ($q) use ($search) {
                     $q->where('name', 'like', $search);
                 });
             })
