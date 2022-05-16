@@ -247,10 +247,11 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->paginate($number);
     }
 
-    public function getListHotPosts($numbert_of_posts = null, $type = 'posts')
+    public function getListHotPosts($numbert_of_posts = null, $type = null)
     {
-        $query = $this->getEntity()->ofType($type)
-            ->with('postMetas')
+        $query = $this->getEntity();
+        $query = $type ? $query->ofType($type) : $query->where('type', '<>', 'pages');
+        $query = $query->with('postMetas')
             ->with('categories')
             ->with('tags')
             ->where('is_hot', 1)
@@ -275,14 +276,15 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->get();
     }
 
-    public function getListOfSearchingPosts($search, $numbert_of_posts = null, $type = 'posts', $absolute_search = false)
+    public function getListOfSearchingPosts($search, $numbert_of_posts = null, $type = null, $absolute_search = false)
     {
         if (!$absolute_search) {
             $search = '%' . $search . '%';
         }
         
-        $query = $this->getEntity()->ofType($type)
-            ->where(function ($where_query) use ($search) {
+        $query = $this->getEntity();
+        $query = $type ? $query->ofType($type) : $query->where('type', '<>', 'pages');
+        $query = $query ->where(function ($where_query) use ($search) {
                 $where_query
                 ->orWhere('title', 'like', $search)
                 ->orWhere('description', 'like', $search)
@@ -304,10 +306,11 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->get();
     }
 
-    public function getListPaginatedHotPosts($per_page = 15, $type = 'posts')
+    public function getListPaginatedHotPosts($per_page = 15, $type = null)
     {
-        $query = $this->getEntity()->ofType($type)
-            ->with('postMetas')
+        $query = $this->getEntity();
+        $query = $type ? $query->ofType($type) : $query->where('type', '<>', 'pages');
+        $query = $query->with('postMetas')
             ->with('categories')
             ->with('tags')
             ->where('is_hot', 1)
@@ -330,14 +333,15 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->paginate($per_page);
     }
 
-    public function getListPaginatedOfSearchingPosts($search, $per_page = 15, $type = 'posts', $absolute_search = false)
+    public function getListPaginatedOfSearchingPosts($search, $per_page = 15, $type = null, $absolute_search = false)
     {
         if (!$absolute_search) {
             $search = '%' . $search . '%';
         }
 
-        $query = $this->getEntity()->ofType($type)
-            ->where(function ($where_query) use ($search) {
+        $query = $this->getEntity();
+        $query = $type ? $query->ofType($type) : $query->where('type', '<>', 'pages');
+        $query = $query->where(function ($where_query) use ($search) {
                 $where_query
                 ->orWhere('title', 'like', $search)
                 ->orWhere('description', 'like', $search)
@@ -358,10 +362,11 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->paginate($per_page);
     }
 
-    public function getListHotTranslatablePosts($numbert_of_posts = null, $type = 'posts')
+    public function getListHotTranslatablePosts($numbert_of_posts = null, $type = null)
     {
-        $query = $this->getEntity()->ofType($type)->with('languages')
-            ->with('postMetas')
+        $query = $this->getEntity()->with('languages');
+        $query = $type ? $query->ofType($type) : $query->where('type', '<>', 'pages');
+        $query = $query->with('postMetas')
             ->with('categories')
             ->with('tags')
             ->where('is_hot', 1)
@@ -386,14 +391,15 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->get();
     }
 
-    public function getListOfSearchingTranslatablePosts($search, $numbert_of_posts = null, $type = 'posts', $absolute_search = false)
+    public function getListOfSearchingTranslatablePosts($search, $numbert_of_posts = null, $type = null, $absolute_search = false)
     {
         if (!$absolute_search) {
             $search = '%' . $search . '%';
         }
 
-        $query = $this->getEntity()->ofType($type)->with('languages')
-            ->where(function ($where_query) use ($search) {
+        $query = $this->getEntity()->with('languages');
+        $query = $type ? $query->ofType($type) : $query->where('type', '<>', 'pages');
+        $query = $query->where(function ($where_query) use ($search) {
                 $where_query
                 ->orWhere('title', 'like', $search)
                 ->orWhere('description', 'like', $search)
@@ -415,10 +421,11 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->get();
     }
 
-    public function getListPaginatedHotTranslatablePosts($per_page = 15, $type = 'posts')
+    public function getListPaginatedHotTranslatablePosts($per_page = 15, $type = null)
     {
-        $query = $this->getEntity()->ofType($type)->with('languages')
-            ->with('postMetas')
+        $query = $this->getEntity()->with('languages');
+        $query = $type ? $query->ofType($type) : $query->where('type', '<>', 'pages');
+        $query = $query->with('postMetas')
             ->with('categories')
             ->with('tags')
             ->where('is_hot', 1)
@@ -441,14 +448,15 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         return $query->paginate($per_page);
     }
 
-    public function getListPaginatedOfSearchingTranslatablePosts($search, $per_page = 15, $type = 'posts', $absolute_search = false)
+    public function getListPaginatedOfSearchingTranslatablePosts($search, $per_page = 15, $type = null, $absolute_search = false)
     {
         if (!$absolute_search) {
             $search = '%' . $search . '%';
         }
 
-        $query = $this->getEntity()->ofType($type)->with('languages')
-            ->where(function ($where_query) use ($search) {
+        $query = $this->getEntity()->with('languages');
+        $query = $type ? $query->ofType($type) : $query->where('type', '<>', 'pages');
+        $query = $query->where(function ($where_query) use ($search) {
                 $where_query
                 ->orWhere('title', 'like', $search)
                 ->orWhere('description', 'like', $search)
