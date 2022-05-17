@@ -45,22 +45,14 @@ trait PostHelper
     /**
      * get post created at
      * 
-     * @return string 
-     */
-    public function getRawCreatedAt()
-    {
-        return $this->published_date ? $this->published_date : $this->created_at;
-    }
-
-    /**
-     * get post formated created at
-     * 
      * @param string $format
+     * @param string $tz
+     * @param string $lang
      * @return string 
      */
-    public function getFormatedCreatedAt($format = null, $tz = null, $lang = 'en')
+    public function getRawCreatedAt($format = null, $tz = null, $lang = 'en')
     {
-        $created_at = $this->getRawCreatedAt();
+        $created_at = $this->published_date ? $this->published_date : $this->created_at;
 
         if ($format) {
             $tz = $tz ? $tz : config('app.timezone');
@@ -140,6 +132,22 @@ trait PostHelper
         } else {
             return null;
         }
+    }
+
+    /**
+     * get post raw description
+     */
+    public function getRawDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * get post raw content
+     */
+    public function getRawContent()
+    {
+        return $this->content;
     }
 
     /**
